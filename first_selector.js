@@ -1,3 +1,8 @@
+
+function clic() {
+    var valeur1 = document.getElementsByTagName("select");
+    console.log("hello");
+    }
 window.onload = function()
 {
 
@@ -64,7 +69,7 @@ window.onload = function()
                     buttonelm.type = "button";
                     buttonelm.value = "Select";
                     buttonelm.id = "button_select"
-                    buttonelm.setAttribute("onclick", "clic()");
+                    buttonelm.onclick = clic;
                     
                     wrap.appendChild(selector2);
                     wrap.appendChild(buttonelm);
@@ -91,8 +96,3 @@ window.onload = function()
    
 }
         
-
-function clic() {
-    var valeur1 = document.getElementsByTagName("select");
-    console.log("hello");
-    }

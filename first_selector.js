@@ -75,7 +75,6 @@ window.onload = function()
                     wrap.appendChild(buttonelm);
                     counter =1;
                     button = document.getElementById("button_select");  
-                    console.log(button);
                    
                 } else 
                 {

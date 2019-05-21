@@ -64,13 +64,13 @@ window.onload = function()
                     buttonelm.type = "button";
                     buttonelm.value = "Select";
                     buttonelm.id = "button_select"
-                    buttonelm.setAttribute("onclick", clic());
+                    buttonelm.setAttribute("onclick", "clic()");
                     
                     wrap.appendChild(selector2);
                     wrap.appendChild(buttonelm);
                     counter =1;
                     button = document.getElementById("button_select");  
-                    
+                    console.log(button);
                    
                 } else 
                 {
@@ -82,15 +82,17 @@ window.onload = function()
             }
         
         }
+
+        /*button = document.getElementById("button_select"); 
+        button.addEventListener("click", clic());*/
+        //console.log(button);
         
     
    
 }
         
-        button.addEventListener("click", clic());
-        console.log(button);
-        function clic() {
-        var valeur1 = document.getElementsByTagName("select");
-        console.log("hello");
-} 
 
+function clic() {
+    var valeur1 = document.getElementsByTagName("select");
+    console.log("hello");
+    }

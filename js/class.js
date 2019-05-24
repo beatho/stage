@@ -1,15 +1,38 @@
 class Node {
-	constructor(_id,_type,_name, _partners, _administrator, _asset, _assetActive,_objective ='',_communityMember =[]) {
+	constructor(_id,_type,_name, _partners, _administrator, _asset, _assetActive,_objective ='',_communityMember = []) {
 		this.id = _id;
 		this.type = _type;
 		this.name = _name;
-		this.partners = _partners;
-		this.administrator = _administrator; 
+		this.partners = [];
+		if (_partners.length >= 1) {
+			for (var partner of _partners) {
+				this.partners.push(partner);
+			} 
+		} 
+		
+		this.administrator = []
+		if (_administrator.length >= 1) {
+			for (var admin of _administrator) {
+				this.administrator.push(admin);
+			} 
+		} 
+		
 		this.asset = _asset;
 		this.assetActive = _assetActive;
 		// only for a community manager
-		this.objective =_objective;
-		this.communityMember =_communityMember;
+		if (this.type == choices.typeNode[1]){
+			this.objective =_objective;
+			this.communityMember =[];
+			if (_communityMember.length >= 1) {
+				for (var member of _communityMember) {
+					this.communityMember.push(member);
+				}  
+			} 
+
+			
+		}
+		
+
 	}
 }
 

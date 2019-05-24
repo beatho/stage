@@ -26,6 +26,7 @@ window.onload = function()
     wrap.appendChild(selector);
     counter = 0;
     selector.onchange = function(choice) {
+        this.options[0].disabled = true;
         //console.log(choice.target.value)
         for (var option of options)
             {
@@ -122,18 +123,13 @@ function changeSelect2() {
         opt.setAttribute("value", '');
         opt.innerText = 'Select...';
         selector3.appendChild(opt);
-        for (agent of data.nodeName) {
+        for (agent of data.node) {
             var opt = document.createElement("option");
-            opt.setAttribute("value", agent);
-            opt.innerText = agent;
+            opt.setAttribute("value", agent.id);
+            opt.innerText = agent.name;
             selector3.appendChild(opt);
         }
-        for(admin of data.nodeAdministratorName) {
-            var opt = document.createElement("option");
-            opt.setAttribute("value", admin);
-            opt.innerText = admin;
-            selector3.appendChild(opt);
-        }
+        
         wrap.insertBefore(selector3,button);
     }
     
@@ -142,8 +138,8 @@ function changeSelect2() {
 
 function clicSelectChoice() {
     var selects = document.getElementsByTagName("select");
-    var value1 = selects[0].value;
-    var value2 = selects[1].value;
+    var value1 = selects[0].options[selects[0].selectedIndex].value;
+    var value2 = selects[1].options[selects[1].selectedIndex].value;
     console.log(value1,value2);
     switch(value1) {
         case options[0].id: // case Add
@@ -173,7 +169,7 @@ function clicSelectChoice() {
                     modLink();
                 break
                 case options[1].data[1]:
-                    value3 = document.getElementById("name_node")
+                    var value3 = selects[2].options[selects[2].selectedIndex].value;
                     modAgCom(value3);
                 break
             }
@@ -240,27 +236,71 @@ function addAgent() {
     textElm.id = "node_name";
     textElm.type = "text";
     //textElm.required = "required";
-    selctElm1.onchange = function(choice) {
-        textElm.value = choice.target.value +' ' + String(data.counter);
-    }
     textElm.onchange = checkname;
     div.appendChild(textElm);
     content.appendChild(div);
-    
-   
+    selctElm1.onchange = function(choice) {
+        var content = document.getElementById("content");
+        textElm.value = choice.target.value +' ' + String(data.node.length);
+        this.options[0].disabled = true;
+        var commuElmt = document.getElementById("Community_membership_old")
+        if (choice.target.value == choices.typeNode[1]) {
+            // remove forms that we don't need
+            var input = document.getElementById("Number_asset");
+                if(input != null){
+                    content.removeChild(input)
+                }
+            // choice of the Community objective:
+            var div = document.createElement("div");
+            div.textContent = "Community objective : ";
+            div.id = "community_objective"
+            var selctElm1 = document.createElement("select");
+            for (choice of choices.comObjective){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", choice);
+                opt.innerText = choice;
+                selctElm1.appendChild(opt);
+            }
+            div.appendChild(selctElm1);
+            var buttonelm = document.getElementById("button_add_node");
+            content.insertBefore(div,buttonelm);
+            // just change a text content of a form
+            commuElmt.textContent = "Community members"
+        } else {
+            var input = document.getElementById("community_objective");
+                if(input != null){
+                    content.removeChild(input)
+                }
+            var div = document.createElement("div");
+            div.textContent = "Number of assets : ";
+            div.id = "Number_asset";
+            var numberElm = document.createElement("input");
+            numberElm.type = "number";
+            numberElm.step = 1;
+            numberElm.min = 1;
+            div.appendChild(numberElm);
+            var buttonelm = document.getElementById("button_add_node");
+            content.insertBefore(div,buttonelm);
+
+            // just change a text content of a form
+            commuElmt.textContent = "Community membership"
+        }
+    }
     
     // choice of trading partners
     var div = document.createElement("div");
     div.textContent = "Trading partners : ";
     var selctElm2 = document.createElement("select");
     selctElm2.id = 'trading';
+    selctElm2.multiple = "multiple";
+    selctElm2.size = 2;
     var opt = document.createElement("option");
     opt.setAttribute("value", undefined);
     opt.innerText = 'None';
-    //selctElm2.appendChild(opt);
+    selctElm2.appendChild(opt);
     for (node of data.node) {
         var opt = document.createElement("option");
-        opt.setAttribute("value", node);
+        opt.setAttribute("value", node.id);
         opt.innerText = node.name;
         selctElm2.appendChild(opt);
     }
@@ -269,18 +309,21 @@ function addAgent() {
 
 
     // choice of community membership
+    
     var div = document.createElement("div");
-    div.textContent = "Community membership : ";
+    div.textContent = "Community membership/members : ";
     div.id = "Community_membership_old"
     var selctElm3 = document.createElement("select");
+    selctElm3.multiple = "multiple";
+    selctElm3.size = 2;
     var opt = document.createElement("option");
-    opt.setAttribute("value", '');
+    opt.setAttribute("value", undefined);
     opt.innerText = 'None';
     selctElm3.appendChild(opt);
     for(admin of data.node) {
         if(admin.type == choices.typeNode[1]){
             var opt = document.createElement("option");
-            opt.setAttribute("value", admin);
+            opt.setAttribute("value", admin.id);
             opt.innerText = admin.name;
             selctElm3.appendChild(opt); 
         }
@@ -289,92 +332,117 @@ function addAgent() {
     div.appendChild(selctElm3);
     content.appendChild(div)
     selctElm2.onchange = function(choice) {
-        //var selctElm2 = document.getElementById("trading");
-        console.log(selctElm2.value.id);
         // choice of community membership
-        var div = document.getElementById("Community_membership_old")
+        var div = document.getElementById("Community_membership_old");
         var div2 = document.createElement("div");
-        div2.textContent = "Community membership : ";
+        div2.textContent = "Community membership/members : ";
         var selctElm3 = document.createElement("select");
+        selctElm3.multiple = "multiple";
+        selctElm3.size = 2;
         var opt = document.createElement("option");
         opt.setAttribute("value", '');
         opt.innerText = 'None';
         selctElm3.appendChild(opt);
         for(admin of data.node) {
-            if(admin.type == choices.typeNode[1] && admin.id !== choice.target.value.id){
-                
+            
+            if((admin.type === choices.typeNode[1]) && (admin.id != choice.target.value)){
                 var opt = document.createElement("option");
-                opt.setAttribute("value", admin);
+                opt.setAttribute("value", admin.id);
                 opt.innerText = admin.name;
                 selctElm3.appendChild(opt); 
             }
             
         }
         div2.appendChild(selctElm3);
-        content.replaceChild(div2,div)
+        content.replaceChild(div2,div);
         div2.id = "Community_membership_old";
         
     }
-    // save of new data
+    /*  save of new data */
     var div = document.createElement("div");
+    div.id = "button_add_node";
     var buttonelm = document.createElement("input");
 
     buttonelm.type = "button";
     buttonelm.value = "Add node";
-    buttonelm.id = "button_select";
-    buttonelm.onclick = clic2;
+    buttonelm.onclick = clicAddNode;
     div.appendChild(buttonelm);
     content.appendChild(div);   
+}
+
+function clicAddNode() {
+    console.log('Saving...')
+    var content = document.getElementById("content");
+    var selects = content.getElementsByTagName("select");
+    var text = document.getElementById("node_name");
+    var type_node = selects[0].options[selects[0].selectedIndex].value;
     
-
-    
-    function clic2() {
-        var content = document.getElementById("content");
-        var selects = content.getElementsByTagName("select");
-        var text = document.getElementById("node_name");
-        var type_node = selects[0].value;
-        var trading_partners = selects[1].value;
-        var administrators = selects[2].value;
-
-        var id_partner = [];
-        var id_admin = [];
-        for (partner of trading_partners)
+    var trading_partners = [];
+    for (var i=0; i < selects[1].options.length; i++) 
+    {
+        if (selects[1].options[i].selected) 
         {
-            id_partner.push(partner.id);
+            trading_partners.push(Number(selects[1].options[i].value));
         }
-        for (admin of administrators)
-        {
-            id_admin.push(admin.id);
-        }
-
-
-        var name = text.value;
-        var agent_temp = new Node(data.counter,type_node,name,id_partner,id_admin,[],[] );
-        data.node[data.counter] = agent_temp;
-        console.log(data.node);
-        if (type_node === choices.typeNode[0]) {
-            data.nodeAgentName.push(name);
-        } else if ( type_node === choices.typeNode[1] ) {
-            data.nodeAdministratorName.push(name);
-        }
-        
-        
-        // create the links 
-        for (id of id_partner) {
-            var k = data.link.length;
-            var link_temp = new Link(k,choices.typeLink[0],data.counter,id,0,0,'');
-            data.link.push(link_temp);
-        }
-        for (id of id_admin) {
-            var k = data.link.length;
-            var link_temp = new Link(k,choices.typeLink[0],data.counter,id,0,0,'');
-            data.link.push(link_temp);
-        }
-        data.counter += 1;
-        //
     }
     
+    var community = [];
+    for (var i=0; i < selects[2].options.length; i++) 
+    {
+        if (selects[2].options[i].selected) 
+        {
+            community.push(Number(selects[2].options[i].value));
+        }
+    }   
+    var name = text.value;
+    if ( data.idLinkUnused.length >0 ) {
+        var id_node = data.idNodeUnused.shift();                
+    } else {
+         var id_node = data.Node.length;
+    }
+    if (type_node == choices.typeNode[1]){
+        var objective = selects[3].options[selects[3].selectedIndex].value;
+        var agent_temp = new Node(id_agent,type_node,name,trading_partners,[],[],[], objective, community );
+    } else if (type_node == choices.typeNode[0]){
+        var agent_temp = new Node(id_agent,type_node,name,trading_partners,community,[],[] );
+    }
+    
+
+    
+    data.node[id_agent] = agent_temp;
+    console.log(data.node);
+    if (type_node === choices.typeNode[0]) {
+        data.nodeAgentName.push(name);
+    } else if ( type_node === choices.typeNode[1] ) {
+        data.nodeAdministratorName.push(name);
+    }
+    
+    
+    // create the links 
+    for (id of trading_partners) {
+        if ( data.idLinkUnused.length >0 ) {
+        var id_link = data.idLinkUnused.shift();                
+    } else {
+         var id_link = data.link.length;
+    }
+        var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
+        data.link.push(link_temp);
+    }
+    for (id of administrators) {
+        if ( data.idLinkUnused.length >0 ) {
+            var id_link = data.idLinkUnused.shift();                
+        } else {
+             var id_link = data.link.length;
+        }
+        var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
+        data.link.push(link_temp);
+    }
+    //
 }
+
+
+
+
 function checkname(choice) {
     //var text = document.getElementById("node_name");
     var node_name = choice.target.value;
@@ -397,7 +465,7 @@ function checkname(choice) {
 
 // beware you need the push the button select to update the names when you add several communities
 function addCom(nb_agent) {
-    console.log('ok pour ' + String(nb_agent) + ' Agent');
+    //console.log('ok pour ' + String(nb_agent) + ' Agent');
     var content = document.getElementById("content");
     content.innerHTML ="";
        
@@ -407,7 +475,7 @@ function addCom(nb_agent) {
     var textElm = document.createElement("input");
     textElm.id = "community_name";
     textElm.type = "text";
-    textElm.value = choices.typeNode[1]+ ' ' + String(data.counter)
+    textElm.value = choices.typeNode[1]+ ' ' + String(data.node.length)
     textElm.onchange = checkname;
     div.appendChild(textElm);
     content.appendChild(div);
@@ -429,6 +497,7 @@ function addCom(nb_agent) {
     var div = document.createElement("div");
     div.textContent = "Trading partners : ";
     var selctElm2 = document.createElement("select");
+    selctElm2.multiple = "multiple"
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
     opt.innerText = 'None';
@@ -448,9 +517,9 @@ function addCom(nb_agent) {
     var textElm = document.createElement("input");
     textElm.id = "community_member_name";
     textElm.type = "text";
-    var Chain_name =choices.typeNode[0]+ ' ' + String(data.counter +1);;
+    var Chain_name =choices.typeNode[0]+ ' ' + String(data.node.length +1);;
     for(var i = 1; i < nb_agent; i++ ) {
-        Chain_name = Chain_name + ',' + choices.typeNode[0]+ ' ' + String(data.counter + 1 + i);
+        Chain_name = Chain_name + ',' + choices.typeNode[0]+ ' ' + String(data.node.length + 1 + i);
     }
     textElm.value = Chain_name;
     div.appendChild(textElm);
@@ -463,18 +532,28 @@ function addCom(nb_agent) {
     buttonelm.type = "button";
     buttonelm.value = "Add community";
     buttonelm.id = "button_add_comm";
-    buttonelm.onclick = clicAddComm;
+    buttonelm.onclick = clicAddComm(nb_agent);
     div.appendChild(buttonelm);
     content.appendChild(div);
-
-    
-    function clicAddComm() {
+}
+function clicAddComm(nb_agent) {
+    return function() {
+        console.log("Saving...");
         var content = document.getElementById("content");
         var selects = content.getElementsByTagName("select");
         var text1 = document.getElementById("community_name");
         var text2 = document.getElementById("community_member_name");
-        var community_objective = selects[0].value; 
-        var trading_partners = selects[1].value;
+        var community_objective = selects[0].selectedIndex ; 
+        var trading_partners = [];
+        for (var i=0; i < selects[1].options.length; i++) 
+        {
+            if (selects[1].options[i].selected) 
+            {
+                trading_partners.push(Number(selects[1].options[i].value));
+            }
+        }
+
+
         var name_admin = text1.value;
 
         var chain_name =text2.value;
@@ -495,57 +574,66 @@ function addCom(nb_agent) {
         names.push(name_temp);
         
         var id_partner = [];
-        for (partner of trading_partners)
-        {
-            id_partner.push(partner.id);
+        if(trading_partners.length >0) {
+            for (partner of trading_partners)
+            {
+                id_partner.push(partner.id);
+            }
         }
+       
         var id_community_merber = [];
         for(var i = 0; i < nb_agent; i++ ) {
-            id_community_merber.push(data.counter+1+i)
+            id_community_merber.push(data.node.length+1+i)
         }
-        id_admin = data.counter;
+        id_admin = data.node.length;
         var admin = new Node(id_admin,choices.typeNode[1], name_admin, id_partner, [], [], [],community_objective, id_community_merber);
         data.nodeAdministratorName.push(name_admin);
         data.node.push(admin);
 
         for(var i = 0; i < nb_agent; i++ ) {
-            data.counter = data.counter +1;
             var name = names[i];
-            var agent_temp = new Node(data.counter,choices.typeNode[0],name,[],id_admin,[],[]);
+            var agent_temp = new Node(data.node.length,choices.typeNode[0],name,[],[id_admin],[],[]);
             data.node.push(agent_temp);
             
             data.nodeAgentName.push(name);
         }
-        data.counter += 1;
      
         
         // create the links 
         for (id of id_partner) {
-            var k = data.link.length;
-            var link_temp = new Link(k,choices.typeLink[0],id_admin,id,0,0,'');
+            if ( data.idLinkUnused.length >0 ) {
+                var id_link = data.idLinkUnused.shift();                
+            } else {
+                 var id_link = data.link.length;
+            }
+            var link_temp = new Link(id_link,choices.typeLink[0],id_admin,id,0,0,'');
             data.link.push(link_temp);
         }
         for (id of id_community_merber) {
-            var k = data.link.length;
-            var link_temp = new Link(k,choices.typeLink[1],id_admin,id,0,0,'');
+            if ( data.idLinkUnused.length >0 ) {
+                var id_link = data.idLinkUnused.shift();                
+            } else {
+                 var id_link = data.link.length;
+            }
+            var link_temp = new Link(id_link,choices.typeLink[1],id_admin,id,0,0,'');
             data.link.push(link_temp);
         }
-    }
-
+    } 
 }
+
   
 function addLink() {
     var content = document.getElementById("content");
     content.innerHTML ="";
 
-    // choice of the type of the node
+    // choice of the type of the link
     var div = document.createElement("div");
     div.textContent = "Link type : ";
     var selctElm1 = document.createElement("select");
-    /*var opt = document.createElement("option");
+    var opt = document.createElement("option");
     opt.setAttribute("value", '');
     opt.innerText = 'Select...';
-    selctElm1.appendChild(opt);*/
+    selctElm1.appendChild(opt);
     for (choice of choices.typeLink){
         var opt = document.createElement("option");
         opt.setAttribute("value", choice);
@@ -566,7 +654,7 @@ function addLink() {
     content.appendChild(div);
     
     selctElm1.onchange = function(choice) {
-       
+        this.options[0].disabled = true; // remove the choice select
         // remove the elements that we don't need on the page
         var wrapper = document.getElementById("wrap");
         if (wrapper !== null){
@@ -580,13 +668,13 @@ function addLink() {
             var div = document.createElement("div");
             div.textContent = "Source : ";
             var selctElm2 = document.createElement("select");
-            /*var opt = document.createElement("option");
+            var opt = document.createElement("option");
             opt.setAttribute("value", '');
             opt.innerText = 'Select...';
-            selctElm2.appendChild(opt);*/
+            selctElm2.appendChild(opt);
             for (node of data.node) {
                 var opt = document.createElement("option");
-                opt.setAttribute("value", node);
+                opt.setAttribute("value", node.id);
                 opt.innerText = node.name;
                 selctElm2.appendChild(opt);
             }
@@ -596,6 +684,7 @@ function addLink() {
             
             
             selctElm2.onchange = function(choice) {
+                this.options[0].disabled = true; // remove the choice select
                 // remove the elements that we don't need on the page
                 var div2er = document.getElementById("div2");
                 if (div2er !== null){
@@ -609,26 +698,29 @@ function addLink() {
                 var div = document.createElement("div");
                 div.textContent = "destination : ";
                 var selctElm3 = document.createElement("select");
-                var source = choice.target.value;
-                /*var opt = document.createElement("option");
+                var source = data.node[choice.target.value];
+                var opt = document.createElement("option");
                 opt.setAttribute("value", '');
                 opt.innerText = 'Select...';
-                selctElm3.appendChild(opt);*/
+                selctElm3.appendChild(opt);
+                console.log(source.partners);
+                console.log(source.administrator);
                 for (agent of data.node) {
                     // show only node who don't have a link with the source
-                    if ( source.id !== agent.id){
-                        console.log(source)
-                        console.log(agent)
-                        if ( source.type === choices.typeNode[0] && source.partner.indexOf(agent.id) === -1 && source.administrator.indexOf(agent.id) === -1){
+                    if ( source.id != agent.id){
+                        
+                        if ( source.type === choices.typeNode[0] && source.partners.indexOf(agent.id) == -1 && source.administrator.indexOf(agent.id) == -1){
+                            
+                            console.log(agent.id)
                             var opt = document.createElement("option");
-                            opt.setAttribute("value", agent);
-                            opt.innerText = agent;
+                            opt.setAttribute("value", agent.id);
+                            opt.innerText = agent.name;
                             selctElm3.appendChild(opt);
 
-                        } else if ( source.type === choices.typeNode[0] && source.partner.indexOf(agent.id) === -1 && source.administrator.indexOf(agent.id) === -1 && source.communityMember.indexOf(agent.id) === -1 ) {
+                        } else if ( source.type === choices.typeNode[1] && source.partners.indexOf(agent.id) == -1 && source.administrator.indexOf(agent.id) == -1 && source.communityMember.indexOf(agent.id) == -1 ) {
                             var opt = document.createElement("option");
-                            opt.setAttribute("value", agent);
-                            opt.innerText = agent;
+                            opt.setAttribute("value", agent.id);
+                            opt.innerText = agent.name;
                             selctElm3.appendChild(opt);
                         }          
                     }  
@@ -638,12 +730,15 @@ function addLink() {
                 wrap.appendChild(div2);
 
                 selctElm3.onchange = function(choice2) {
+                    this.options[0].disabled = true; // remove the choice select
                     var input1 = document.getElementById("preferenceSource");
                     var input2 = document.getElementById("preferenceDestination");
+                    var input3 = document.getElementById("button_add_link")
 
                     if (input1 !== null){
                         div2.removeChild(input1)
                         div2.removeChild(input2)
+                        div2.removeChild(input3)
                     } 
                     var div = document.createElement("div")
                     div.textContent = "Preference of the source : ";
@@ -675,14 +770,15 @@ function addLink() {
 
                     // button to save the choice
                     var div = document.createElement("div");
+                    div.id = "button_add_link";
                     var buttonelm = document.createElement("input");
 
                     buttonelm.type = "button";
                     buttonelm.value = "Add link";
-                    buttonelm.id = "button_add_link";
                     buttonelm.onclick = clicAddLink;
                     div.appendChild(buttonelm);
-                    content.appendChild(div);
+                    div2.appendChild(div);
+                    wrap.appendChild(div2);
                 }
             }
             content.appendChild(wrap);
@@ -699,7 +795,7 @@ function addLink() {
             selctElm2.appendChild(opt);
             for (node of data.node) {
                 var opt = document.createElement("option");
-                opt.setAttribute("value", node);
+                opt.setAttribute("value", node.id);
                 opt.innerText = node.name;
                 selctElm2.appendChild(opt);
             }
@@ -709,6 +805,7 @@ function addLink() {
             
             
             selctElm2.onchange = function(choice) {
+                this.options[0].disabled = true; // remove the choice select
                 // remove the elements that we don't need on the page
                 var div2er = document.getElementById("div2");
                 if (div2er !== null){
@@ -722,31 +819,31 @@ function addLink() {
                 var div = document.createElement("div");
                 div.textContent = "destination : ";
                 var selctElm3 = document.createElement("select");
-                var source = choice.target.value;
+                var source = data.node[choice.target.value];
                 var opt = document.createElement("option");
                 opt.setAttribute("value", '');
                 opt.innerText = 'Select...';
-                selctElm3.appendChild(opt);
+                //selctElm3.appendChild(opt);
                 for (agent of data.node) {
                     // show only node which don't have a link with the source
-                    if ( source.id!== agent.id && agent.type === choices.typeNode[0] ){
-                        if ( source.type === choices.typeNode[0] && source.partner.indexOf(agent.id) === -1 && source.administrator.indexOf(agent.id) === -1){
+                    if ( source.id != agent.id && agent.type === choices.typeNode[1] ){
+                        if ( source.type === choices.typeNode[0] && source.partners.indexOf(agent.id) === -1 && source.administrator.indexOf(agent.id) === -1){
                             var opt = document.createElement("option");
-                            opt.setAttribute("value", agent);
-                            opt.innerText = agent;
+                            opt.setAttribute("value", agent.id);
+                            opt.innerText = agent.name;
                             selctElm3.appendChild(opt);
 
-                        } else if ( source.type === choices.typeNode[1] && source.partner.indexOf(agent.id) === -1 && source.administrator.indexOf(agent.id) === -1 && source.communityMember.indexOf(agent.id) === -1 ) {
+                        } else if ( source.type === choices.typeNode[1] && source.partners.indexOf(agent.id) === -1 && source.administrator.indexOf(agent.id) === -1 && source.communityMember.indexOf(agent.id) === -1 ) {
                             var opt = document.createElement("option");
-                            opt.setAttribute("value", agent);
-                            opt.innerText = agent;
+                            opt.setAttribute("value", agent.id);
+                            opt.innerText = agent.name;
                             selctElm3.appendChild(opt);
                         }          
                     }  
                 }
                 div.appendChild(selctElm3);
                 div2.appendChild(div);
-                wrap.appendChild(div2);
+                
                  // button to save the choice
                 var div = document.createElement("div");
                 var buttonelm = document.createElement("input");
@@ -756,36 +853,44 @@ function addLink() {
                 buttonelm.id = "button_add_link";
                 buttonelm.onclick = clicAddLink;
                 div.appendChild(buttonelm);
-                content.appendChild(div);
+                div2.appendChild(div);
+                wrap.appendChild(div2);
             }
             content.appendChild(wrap);
         }
     }
 }
 function clicAddLink() {
+    console.log("saving...")
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
     var text = document.getElementById("link_name");
     var input1 = document.getElementById("inputPreferenceSource");
     var input2 = document.getElementById("inputPreferenceDestination");
 
-    var type_link = selects[0].value;
-    var source = selects[1].value;
-    var destination = selects[2].value;
+    var type_link = selects[0].selectedIndex ;
+    var source = selects[1].selectedIndex ;
+    var destination = selects[2].selectedIndex ;
     var name = text.value;
-    var counter = data.link.length;
+
+    if ( data.idLinkUnused.length >0 ) {
+        var id_link = data.idLinkUnused.shift();                
+    } else {
+         var id_link = data.link.length;
+    }
+
     var weightSrc = input1.value;
     var weightDest = input2.value;
-    var link_temp = new Link(counter,type_link,source.id,destination.id,name,weightSrc,weightDest);
+    var link_temp = new Link(id_link,type_link,source,destination,name,weightSrc,weightDest);
     data.link.push(link_temp);
     console.log(data.link);
     if (type_link === choices.typeLink[0]) {
-        data.node[source.id].partner.push(destination.id);
-        data.node[destination.id].partner.push(source.id);
+        data.node[source].partner.push(destination);
+        data.node[destination].partner.push(source);
 
     } else if (type_link === choices.typeLink[1]) {
-        data.node[source.id].administrator.push(destination.id);
-        data.node[destination.id].communityMember.push(source.id)
+        data.node[source].administrator.push(destination);
+        data.node[destination].communityMember.push(source)
     }
 }
 
@@ -798,7 +903,228 @@ function addExample() {
 function addFile() {
 
 }
-function modAgCom(nodeName) {
+function modAgCom(nodeId) {
+    var content = document.getElementById("content");
+    var oldNode = data.node[nodeId];
+    content.innerHTML ="";
+
+    // choice of the type of the node
+    var div = document.createElement("div");
+    div.textContent = "Agent type : ";
+    var selctElm1 = document.createElement("select");
+    
+    for (choice of choices.typeNode){
+        var opt = document.createElement("option");
+        opt.setAttribute("value", choice);
+        opt.innerText = choice;
+        selctElm1.appendChild(opt);    
+        if(choice == oldNode.type) {
+            opt.selected = "selected";
+        }
+        
+    }
+    div.appendChild(selctElm1);
+    content.appendChild(div);
+   
+    // choice of the name
+    var div = document.createElement("div");
+    div.textContent = "Agent name : ";
+    var textElm = document.createElement("input");
+    textElm.id = "node_name";
+    textElm.type = "text";
+    textElm.value = oldNode.name;
+    //textElm.required = "required";
+    textElm.onchange = checkname;
+    div.appendChild(textElm);
+    content.appendChild(div);
+    selctElm1.onchange = function(choice) {
+        var content = document.getElementById("content");
+        textElm.value = choice.target.value +' ' + String(oldNode.id);
+        this.options[0].disabled = true;
+        if (choice.target.value == choices.typeNode[1]) {
+            // choice of the Community objective:
+            var div = document.createElement("div");
+            div.textContent = "Community objective : ";
+            div.id = "community_objective"
+            var selctElm1 = document.createElement("select");
+            for (choice of choices.comObjective){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", choice);
+                opt.innerText = choice;
+                selctElm1.appendChild(opt);
+                if(choice == oldNode.objective){
+                    opt.selected = "selected";
+                }
+            }
+            div.appendChild(selctElm1);
+            var buttonelm = document.getElementById("button_add_node");
+            content.insertBefore(div,buttonelm);
+        } else {
+            var input = document.getElementById("community_objective");
+                if(input != null){
+                    content.removeChild(input)
+                }
+        }
+    }
+    
+    // choice of trading partners
+    var div = document.createElement("div");
+    div.textContent = "Trading partners : ";
+    var selctElm2 = document.createElement("select");
+    selctElm2.id = 'trading';
+    selctElm2.multiple = "multiple";
+    selctElm2.size = 2;
+    var opt = document.createElement("option");
+    opt.setAttribute("value", undefined);
+    opt.innerText = 'None';
+    selctElm2.appendChild(opt);
+    for (node of data.node) {
+        var opt = document.createElement("option");
+        opt.setAttribute("value", node.id);
+        opt.innerText = node.name;
+        selctElm2.appendChild(opt);
+        if (oldNode.partners.indexOf(node.id) != -1) {
+            opt.selected = "selected";
+        }
+    }
+    div.appendChild(selctElm2);
+    content.appendChild(div);
+
+
+    // choice of community membership
+    var div = document.createElement("div");
+    div.textContent = "Community membership : ";
+    div.id = "Community_membership_old";
+    var selctElm3 = document.createElement("select");
+    selctElm3.multiple = "multiple";
+    selctElm3.size = 2;
+    var opt = document.createElement("option");
+    opt.setAttribute("value", undefined);
+    opt.innerText = 'None';
+    selctElm3.appendChild(opt);
+    for(admin of data.node) {
+        if(admin.type == choices.typeNode[1]){
+            var opt = document.createElement("option");
+            opt.setAttribute("value", admin.id);
+            opt.innerText = admin.name;
+            selctElm3.appendChild(opt); 
+            if(oldNode.administrator.indexOf(admin.id) != -1) {
+                opt.selected = "selected";
+            }
+        }
+        
+    }
+    div.appendChild(selctElm3);
+    content.appendChild(div);
+    selctElm2.onchange = function(choice) {
+        // choice of community membership
+        var div = document.getElementById("Community_membership_old")
+        var div2 = document.createElement("div");
+        div2.textContent = "Community membership : ";
+        var selctElm3 = document.createElement("select");
+        selctElm3.multiple = "multiple";
+        selctElm3.size = 2;
+        var opt = document.createElement("option");
+        opt.setAttribute("value", '');
+        opt.innerText = 'None';
+        selctElm3.appendChild(opt);
+        for(admin of data.node) {
+            
+            if((admin.type === choices.typeNode[1]) && (admin.id != choice.target.value)){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", admin.id);
+                opt.innerText = admin.name;
+                selctElm3.appendChild(opt); 
+                if(oldNode.administrator.indexOf(admin.id) != -1) {
+                    opt.selected = "selected";
+                }
+            }
+            
+        }
+        div2.appendChild(selctElm3);
+        content.replaceChild(div2,div)
+        div2.id = "Community_membership_old";
+        
+    }
+    // save of new data
+    var div = document.createElement("div");
+    div.id = "button_add_node";
+    var buttonelm = document.createElement("input");
+
+    buttonelm.type = "button";
+    buttonelm.value = "Add node";
+    buttonelm.onclick = clicModNode;
+    div.appendChild(buttonelm);
+    content.appendChild(div);   
+    
+
+    
+    function clicModNode() {
+        console.log('Saving...')
+        var content = document.getElementById("content");
+        var selects = content.getElementsByTagName("select");
+        var text = document.getElementById("node_name");
+        var type_node = selects[0].options[selects[0].selectedIndex].value;
+        
+        var trading_partners = [];
+        for (var i=0; i < selects[1].options.length; i++) 
+        {
+            if (selects[1].options[i].selected) 
+            {
+                trading_partners.push(Number(selects[1].options[i].value));
+            }
+        }
+        
+        var administrators = [];
+        for (var i=0; i < selects[2].options.length; i++) 
+        {
+            if (selects[2].options[i].selected) 
+            {
+                administrators.push(Number(selects[2].options[i].value));
+            }
+        }   
+        var name = text.value;
+        var id_agent = oldNode.id;
+        var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,[],[] );
+        data.node[id_agent] = agent_temp;
+        console.log(data.node);
+        if (type_node === choices.typeNode[0]) {
+            data.nodeAgentName.push(name);
+        } else if ( type_node === choices.typeNode[1] ) {
+            data.nodeAdministratorName.push(name);
+        }
+        // remove the old links
+        len = data.link.lenght;
+        for(var indice =0; indice < len ; i++) {
+            var link = data.link[indice];
+            if (link.source == oldNode.id || link.destination == oldNode.id){
+                delete data.link[indice];
+                data.idLinkUnused.push(indice);
+            }
+        }
+        // create the new links 
+        for (id of trading_partners) {
+            if ( data.idLinkUnused.length >0 ) {
+                id_link = data.idLinkUnused.shift();                
+            } else {
+                 var id_link = data.link.length;
+            }
+           
+            var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
+            data.link.push(link_temp);
+        }
+        for (id of administrators) {
+            if ( data.idLinkUnused.length >0 ) {
+                id_link = data.idLinkUnused.shift();                
+            } else {
+                 var id_link = data.link.length;
+            }
+            var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
+            data.link.push(link_temp);
+        }
+        //
+    }
+    
 
 }
 function modLink() {

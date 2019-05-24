@@ -4,8 +4,9 @@ data = {
     nodeAdministratorName: [],
     link: [],
     Asset: [],
-    counter:0,
-    node:[],
+    node: [],
+    idLinkUnused: [],
+    idNodeUnused: []
 }
 options = [ {
     id: "Add",

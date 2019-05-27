@@ -3,10 +3,12 @@ data = {
     nodeAgentName: [],
     nodeAdministratorName: [],
     link: [],
-    Asset: [],
+    asset: [],
     node: [],
     idLinkUnused: [],
-    idNodeUnused: []
+    idNodeUnused: [],
+    old_onglet: "asset_1",
+    oldNbAsset: 1
 }
 options = [ {
     id: "Add",
@@ -33,5 +35,9 @@ options = [ {
 choices = {
     typeNode : [ "Agent", "Community Manager"],
     typeLink : [ "Partnership", "Community membership"],
-    comObjective : ["Lowest Price", "Autonomy"]
+    comObjective : ["Lowest Price", "Autonomy"],
+    deleteAgent : ["The agent", "Some of its assets"],
+    deleteCom : ["All Community", "Only the community manager"],
+    typeAsset : ["Flexible", "uncontrollable", "uncertain" ],
+    functionType : ["Quadratique"]
 }

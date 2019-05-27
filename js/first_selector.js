@@ -1,8 +1,13 @@
-// problème avec addAgent et addLink, je n'arrive pas à récuperer la valeur du select car c'est un object avant quand je mettais juste le nom
-// je pouvais juste faire select.value ou choice.target.value lors d'un change 
+// la classe L300 n'est pas prise en compte !!!! WHY ???
+// l'ajout du select l 482 idem... et de l'id l
 
-window.onload = function()
-{   var wrap = document.getElementById("first_selection");
+
+
+window.addEventListener("load",function()
+{   
+    
+
+    var wrap = document.getElementById("first_selection");
     wrap.textContent = "Actions : ";
     wrap.appendChild(document.createElement("br"));
     
@@ -85,7 +90,8 @@ window.onload = function()
         } 
 
 
-}
+});
+
 function changeSelect2() {
     var wrap = document.getElementById("first_selection");
     var selects = document.getElementsByTagName("select");
@@ -217,7 +223,7 @@ function addAgent() {
     div.textContent = "Agent type : ";
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
-    opt.setAttribute("value", '');
+    opt.setAttribute("value", undefined);
     opt.innerText = 'Select...';
     selctElm1.appendChild(opt);
     for (choice of choices.typeNode){
@@ -241,15 +247,31 @@ function addAgent() {
     content.appendChild(div);
     selctElm1.onchange = function(choice) {
         var content = document.getElementById("content");
+        var textElm = document.getElementById("node_name");
         textElm.value = choice.target.value +' ' + String(data.node.length);
         this.options[0].disabled = true;
-        var commuElmt = document.getElementById("Community_membership_old")
+
+        
+
         if (choice.target.value == choices.typeNode[1]) {
+            // change the legend if the form exists
+            var commuElmt = document.getElementById("Community_membership")
+            if (commuElmt != null){
+                commuElmt.textContent = "Community membership"
+            }
+                        
+            
             // remove forms that we don't need
             var input = document.getElementById("Number_asset");
-                if(input != null){
-                    content.removeChild(input)
-                }
+            var tab = document.getElementById("onglets")
+            var tab2 = document.getElementById("contenu_onglet")
+            if(input != null){
+                content.removeChild(input)
+            }
+            if(tab != null) {
+                content.removeChild(tab);
+                content.removeChild(tab2);
+            }
             // choice of the Community objective:
             var div = document.createElement("div");
             div.textContent = "Community objective : ";
@@ -264,12 +286,16 @@ function addAgent() {
             div.appendChild(selctElm1);
             var buttonelm = document.getElementById("button_add_node");
             content.insertBefore(div,buttonelm);
-            // just change a text content of a form
-            commuElmt.textContent = "Community members"
-        } else {
+
+        } else if (choice.target.value == choices.typeNode[0]){
+            var commuElmt = document.getElementById("Community_membership")
+            if (commuElmt != null){
+                commuElmt.textContent = "Community members"
+            }
+
             var input = document.getElementById("community_objective");
-                if(input != null){
-                    content.removeChild(input)
+                if(input != null) {
+                    content.removeChild(input);
                 }
             var div = document.createElement("div");
             div.textContent = "Number of assets : ";
@@ -278,12 +304,122 @@ function addAgent() {
             numberElm.type = "number";
             numberElm.step = 1;
             numberElm.min = 1;
+            numberElm.value = 1;
             div.appendChild(numberElm);
             var buttonelm = document.getElementById("button_add_node");
             content.insertBefore(div,buttonelm);
 
-            // just change a text content of a form
-            commuElmt.textContent = "Community membership"
+            // creation of the default tab
+            var div2 = document.createElement("div");
+            div2.class = "onglets";
+            div2.id = "onglets";
+            var span = document.createElement("span");
+            span.class = "onglet_1 onglet";
+            span.id = "onglet_asset_" + String(1);
+            span.onclick = change_onglet("asset_" + String(1));
+            span.textContent = "Asset n°" + String(1);
+            div2.appendChild(span);
+            content.insertBefore(div2,buttonelm);
+            
+            var div3 = document.createElement("div");
+            div3.class = "contenu_onglet";
+            div3.id = "contenu_onglet";
+            var div4 = document.createElement("div");
+            div4.class = "contenu_onglet";
+            div4.id = 'contenu_onglet_asset_' + String(1);
+            
+            var div = document.createElement("div");
+            div.textContent = "Asset type : ";
+            var selctElm1 = document.createElement("select");
+            var opt = document.createElement("option");
+            opt.setAttribute("value", '');
+            opt.innerText = 'Select...';
+            selctElm1.appendChild(opt);
+            for (choice of choices.typeAsset){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", choice);
+                opt.innerText = choice;
+                selctElm1.appendChild(opt);
+            }
+            div.appendChild(selctElm1);
+            div4.appendChild(div);
+            div3.appendChild(div4)
+            content.insertBefore(div3,buttonelm);
+        
+            // choice of the name
+            var div = document.createElement("div");
+            div.textContent = "Link name : ";
+            var textElm = document.createElement("input");
+            textElm.id = "link_name";
+            textElm.type = "text";
+            textElm.value = 'Link ' + String(data.link.length);
+            div.appendChild(textElm);
+            div4.appendChild(div);
+            div3.appendChild(div4) 
+                
+
+            numberElm.onchange = function(choice) {
+                var nb_asset = choice.target.value;
+                if (nb_asset < data.oldNbAsset) {
+                    for (var indice= nb_asset; indice < data.oldNbAsset; indice++) {
+                        var tabs = document.getElementById('onglet_asset_' + String(indice+1));
+                        var tabs2 = document.getElementById('contenu_onglet_asset_' + String(indice+1));
+                        if(tabs != null){
+                            content.removeChild(tabs);
+                            content.removeChild(tabs2);
+                        }
+                    }
+                   data.oldNbAsset = nb_asset; 
+                } else if (nb_asset > data.oldNbAsset) {
+                    var div2 = document.getElementById("onglets");             
+                    for (var indice = data.oldNbAsset ; indice < Number(nb_asset); indice++) {
+                        var span = document.createElement("span");
+                        span.class = "onglet_0 onglet";
+                        span.id = "onglet_asset_" + String(indice+1);
+                        span.onclick = change_onglet("asset_" + String(indice+1));
+                        span.textContent = "Asset n°" + String(indice+1);
+                        div2.appendChild(span);
+                        //<span class="onglet_0 onglet" id="onglet_quoi" onclick="javascript:change_onglet('quoi');">Quoi</span>
+                    }
+                    var div3 = document.getElementById("contenu_onglets");
+                    for (var indice = data.oldNbAsset; indice < Number(nb_asset); indice++) {
+                        // choice of the type of the Asset
+                        var div4 = document.createElement("div");
+                        div4.class = "contenu_onglet";
+                        div4.id = 'contenu_onglet_asset_' + String(indice+1);
+                        
+                        var div = document.createElement("div");
+                        div.textContent = "Asset type : ";
+                        var selctElm1 = document.createElement("select");
+                        var opt = document.createElement("option");
+                        opt.setAttribute("value", '');
+                        opt.innerText = 'Select...';
+                        selctElm1.appendChild(opt);
+                        for (choice of choices.typeAsset){
+                            var opt = document.createElement("option");
+                            opt.setAttribute("value", choice);
+                            opt.innerText = choice;
+                            selctElm1.appendChild(opt);
+                        }
+                        div.appendChild(selctElm1);
+                        div4.appendChild(div);
+                    
+                        // choice of the name
+                        var div = document.createElement("div");
+                        div.textContent = "Link name : ";
+                        var textElm = document.createElement("input");
+                        textElm.id = "link_name";
+                        textElm.type = "text";
+                        textElm.value = 'Link ' + String(data.link.length);
+                        div.appendChild(textElm);
+                        div4.appendChild(div);
+                        div3.appendChild(div4) 
+                
+                    }        
+                }
+                data.oldNbAsset = nb_asset; 
+
+            }
         }
     }
     
@@ -306,58 +442,68 @@ function addAgent() {
     }
     div.appendChild(selctElm2);
     content.appendChild(div);
+    new SlimSelect({
+        select: '#trading'
+    })
 
-
-    // choice of community membership
-    
-    var div = document.createElement("div");
-    div.textContent = "Community membership/members : ";
-    div.id = "Community_membership_old"
-    var selctElm3 = document.createElement("select");
-    selctElm3.multiple = "multiple";
-    selctElm3.size = 2;
-    var opt = document.createElement("option");
-    opt.setAttribute("value", undefined);
-    opt.innerText = 'None';
-    selctElm3.appendChild(opt);
-    for(admin of data.node) {
-        if(admin.type == choices.typeNode[1]){
-            var opt = document.createElement("option");
-            opt.setAttribute("value", admin.id);
-            opt.innerText = admin.name;
-            selctElm3.appendChild(opt); 
-        }
-        
-    }
-    div.appendChild(selctElm3);
-    content.appendChild(div)
     selctElm2.onchange = function(choice) {
+        var buttonelm = document.getElementById("button_add_node")
+        var asset = document.getElementById("Number_asset")
         // choice of community membership
-        var div = document.getElementById("Community_membership_old");
+        var div = document.getElementById("Community_membership");
+        
         var div2 = document.createElement("div");
-        div2.textContent = "Community membership/members : ";
         var selctElm3 = document.createElement("select");
         selctElm3.multiple = "multiple";
         selctElm3.size = 2;
+        selctElm3.id = 'community'
         var opt = document.createElement("option");
-        opt.setAttribute("value", '');
+        opt.setAttribute("value", undefined);
         opt.innerText = 'None';
         selctElm3.appendChild(opt);
+        var trading = [];
+        
+    
+        for (var j=0; j < this.options.length; j++) {
+            if (this.options[j].selected) 
+            {
+                trading.push(Number(this.options[j].value));
+            }
+        }   
         for(admin of data.node) {
-            
-            if((admin.type === choices.typeNode[1]) && (admin.id != choice.target.value)){
+            if((admin.type === choices.typeNode[1]) && (trading.indexOf(admin.id))== -1)
+            {
                 var opt = document.createElement("option");
                 opt.setAttribute("value", admin.id);
                 opt.innerText = admin.name;
                 selctElm3.appendChild(opt); 
+            } 
+        }
+        
+        div2.appendChild(selctElm3);
+        if (div != null) {
+            console.log("ok2")
+            div2.textContent = div.innerHTML.split("<")[0] ;
+            content.replaceChild(div2,div);
+        } else {
+            if (selctElm1.options[selctElm1.selectedIndex].value == choices.typeNode[0]){
+                console.log("ok");
+                div2.textContent = "Community membership test :"; 
+                content.insertBefore(div2,asset);
+
+            } else if (selctElm1.options[selctElm1.selectedIndex].value == choices.typeNode[1]) {
+                div2.textContent = "Community members test 2 :" ;  
+                content.insertBefore(div2,buttonelm);
             }
             
         }
-        div2.appendChild(selctElm3);
-        content.replaceChild(div2,div);
-        div2.id = "Community_membership_old";
-        
+        /*new SlimSelect({
+            select: '#community'
+        })*/
+        div2.id = "Community_membership";
+   
     }
+
     /*  save of new data */
     var div = document.createElement("div");
     div.id = "button_add_node";
@@ -378,38 +524,59 @@ function clicAddNode() {
     var type_node = selects[0].options[selects[0].selectedIndex].value;
     
     var trading_partners = [];
+    
     for (var i=0; i < selects[1].options.length; i++) 
     {
         if (selects[1].options[i].selected) 
         {
-            trading_partners.push(Number(selects[1].options[i].value));
+            trading_partners.push(selects[1].options[i].value);
+        }
+    }
+    if (trading_partners[0] == 'undefined'){
+        trading_partners = [];
+    } else 
+    {
+        for (var i=0; i< trading_partners.length; i++) {
+            trading_partners[i] = Number(trading_partners[i])
         }
     }
     
+    
     var community = [];
-    for (var i=0; i < selects[2].options.length; i++) 
-    {
-        if (selects[2].options[i].selected) 
+    
+    for (var j=0; j < selects[2].options.length; j++) {
+        if (selects[2].options[j].selected) 
         {
-            community.push(Number(selects[2].options[i].value));
+            community.push(selects[2].options[j].value);
         }
     }   
+    
+    if (community[0] == 'undefined'){
+        community = [];
+    } else 
+    {
+        for (var i=0; i< community.length; i++) {
+            community[i] = Number(community[i])
+        }
+    }
+    
     var name = text.value;
     if ( data.idLinkUnused.length >0 ) {
         var id_node = data.idNodeUnused.shift();                
     } else {
-         var id_node = data.Node.length;
+         var id_node = data.node.length;
     }
     if (type_node == choices.typeNode[1]){
         var objective = selects[3].options[selects[3].selectedIndex].value;
-        var agent_temp = new Node(id_agent,type_node,name,trading_partners,[],[],[], objective, community );
+        var agent_temp = new Node(id_node,type_node,name,trading_partners,[],[],[], objective, community );
     } else if (type_node == choices.typeNode[0]){
-        var agent_temp = new Node(id_agent,type_node,name,trading_partners,community,[],[] );
+        var agent_temp = new Node(id_node,type_node,name,trading_partners,community,[],[] );
     }
     
 
     
-    data.node[id_agent] = agent_temp;
+    data.node[id_node] = agent_temp;
+    console.log(community);
     console.log(data.node);
     if (type_node === choices.typeNode[0]) {
         data.nodeAgentName.push(name);
@@ -425,23 +592,26 @@ function clicAddNode() {
     } else {
          var id_link = data.link.length;
     }
-        var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
+        var link_temp = new Link(id_link,choices.typeLink[0],id_node,id,0,0,'');
         data.link.push(link_temp);
     }
-    for (id of administrators) {
+    for (id of community) {
         if ( data.idLinkUnused.length >0 ) {
             var id_link = data.idLinkUnused.shift();                
         } else {
              var id_link = data.link.length;
         }
-        var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
+        // the source is always the community manager
+        if(type_node == choices.typeNode[0]) {
+            var link_temp = new Link(id_link,choices.typeLink[0],id,id_node,0,0,'');
+        } else if (type_node == choices.typeNode[1]) {
+            var link_temp = new Link(id_link,choices.typeLink[0],id_node,id,0,0,'');
+        }
+        
         data.link.push(link_temp);
     }
     //
 }
-
-
-
 
 function checkname(choice) {
     //var text = document.getElementById("node_name");
@@ -498,18 +668,22 @@ function addCom(nb_agent) {
     div.textContent = "Trading partners : ";
     var selctElm2 = document.createElement("select");
     selctElm2.multiple = "multiple"
+    selctElm2.id = "trading"
     var opt = document.createElement("option");
-    opt.setAttribute("value", '');
+    opt.setAttribute("value", undefined);
     opt.innerText = 'None';
     selctElm2.appendChild(opt);
     for (node of data.node) {
         var opt = document.createElement("option");
-        opt.setAttribute("value", node);
+        opt.setAttribute("value", node.id);
         opt.innerText = node.name;
         selctElm2.appendChild(opt);
     }
     div.appendChild(selctElm2);
     content.appendChild(div);
+    new SlimSelect({
+        select: '#trading'
+    })
     
     // choice of the names of the agent
     var div = document.createElement("div");
@@ -543,13 +717,22 @@ function clicAddComm(nb_agent) {
         var selects = content.getElementsByTagName("select");
         var text1 = document.getElementById("community_name");
         var text2 = document.getElementById("community_member_name");
-        var community_objective = selects[0].selectedIndex ; 
+        var community_objective = selects[0].options[selects[0].selectedIndex].value ; 
         var trading_partners = [];
+        
         for (var i=0; i < selects[1].options.length; i++) 
         {
             if (selects[1].options[i].selected) 
             {
-                trading_partners.push(Number(selects[1].options[i].value));
+                trading_partners.push(selects[1].options[i].value);
+            }
+        }
+        if (trading_partners[0] == "undefined"){
+            trading_partners = [];
+        } else 
+        {
+            for (var i=0; i< trading_partners.length; i++) {
+                trading_partners[i] = Number(trading_partners[i])
             }
         }
 
@@ -606,7 +789,8 @@ function clicAddComm(nb_agent) {
             } else {
                  var id_link = data.link.length;
             }
-            var link_temp = new Link(id_link,choices.typeLink[0],id_admin,id,0,0,'');
+            var name = 'Link ' + String(data.link.length);
+            var link_temp = new Link(id_link,choices.typeLink[0],id_admin,id,name,0,0);
             data.link.push(link_temp);
         }
         for (id of id_community_merber) {
@@ -615,12 +799,12 @@ function clicAddComm(nb_agent) {
             } else {
                  var id_link = data.link.length;
             }
-            var link_temp = new Link(id_link,choices.typeLink[1],id_admin,id,0,0,'');
+            var name = 'Link ' + String(data.link.length);
+            var link_temp = new Link(id_link,choices.typeLink[1],id_admin,id,name,0,0);
             data.link.push(link_temp);
         }
     } 
-}
-
+} 
   
 function addLink() {
     var content = document.getElementById("content");
@@ -703,15 +887,15 @@ function addLink() {
                 opt.setAttribute("value", '');
                 opt.innerText = 'Select...';
                 selctElm3.appendChild(opt);
-                console.log(source.partners);
-                console.log(source.administrator);
+                //console.log(source.partners);
+                //console.log(source.administrator);
                 for (agent of data.node) {
                     // show only node who don't have a link with the source
                     if ( source.id != agent.id){
                         
                         if ( source.type === choices.typeNode[0] && source.partners.indexOf(agent.id) == -1 && source.administrator.indexOf(agent.id) == -1){
                             
-                            console.log(agent.id)
+                            //console.log(agent.id)
                             var opt = document.createElement("option");
                             opt.setAttribute("value", agent.id);
                             opt.innerText = agent.name;
@@ -761,7 +945,7 @@ function addLink() {
                     var inputElm = document.createElement("input");
                     inputElm.type = "number";
                     inputElm.step = "any";
-                    inputElm.id = "InputPreferenceDestination";
+                    inputElm.id = "inputPreferenceDestination";
                     inputElm.min = 0;
                     inputElm.value = 0;
                     inputElm.placeholder = 0.0;
@@ -817,13 +1001,13 @@ function addLink() {
 
                 // choice of the community manager
                 var div = document.createElement("div");
-                div.textContent = "destination : ";
+                div.textContent = "Community manager : ";
                 var selctElm3 = document.createElement("select");
                 var source = data.node[choice.target.value];
                 var opt = document.createElement("option");
                 opt.setAttribute("value", '');
                 opt.innerText = 'Select...';
-                //selctElm3.appendChild(opt);
+                selctElm3.appendChild(opt);
                 for (agent of data.node) {
                     // show only node which don't have a link with the source
                     if ( source.id != agent.id && agent.type === choices.typeNode[1] ){
@@ -843,18 +1027,59 @@ function addLink() {
                 }
                 div.appendChild(selctElm3);
                 div2.appendChild(div);
-                
-                 // button to save the choice
-                var div = document.createElement("div");
-                var buttonelm = document.createElement("input");
 
-                buttonelm.type = "button";
-                buttonelm.value = "Add link";
-                buttonelm.id = "button_add_link";
-                buttonelm.onclick = clicAddLink;
-                div.appendChild(buttonelm);
-                div2.appendChild(div);
+                selctElm3.onchange = function(choice2) {
+                    this.options[0].disabled = true; // remove the choice select
+                    var input1 = document.getElementById("preferenceSource");
+                    var input2 = document.getElementById("preferenceDestination");
+                    var input3 = document.getElementById("button_add_link")
+
+                    if (input1 !== null){
+                        div2.removeChild(input1)
+                        div2.removeChild(input2)
+                        div2.removeChild(input3)
+                    } 
+                    var div = document.createElement("div")
+                    div.textContent = "Preference of the community manager : ";
+                    div.id = "preferenceSource"
+                    var inputElm = document.createElement("input");
+                    inputElm.type = "number";
+                    inputElm.step = "any";
+                    inputElm.value = 0;
+                    inputElm.id = "inputPreferenceSource";
+                    inputElm.min = 0;
+                    inputElm.placeholder = 0.0;
+
+                    div.appendChild(inputElm);
+                    div2.appendChild(div);
+
+
+                    var div = document.createElement("div")
+                    div.textContent = "Preference of the agent : ";
+                    div.id = "preferenceDestination"
+                    var inputElm = document.createElement("input");
+                    inputElm.type = "number";
+                    inputElm.step = "any";
+                    inputElm.id = "inputPreferenceDestination";
+                    inputElm.min = 0;
+                    inputElm.value = 0;
+                    inputElm.placeholder = 0.0;
+                    div.appendChild(inputElm);
+                    div2.appendChild(div);
+
+                    // button to save the choice
+                    var div = document.createElement("div");
+                    div.id = "button_add_link";
+                    var buttonelm = document.createElement("input");
+
+                    buttonelm.type = "button";
+                    buttonelm.value = "Add link";
+                    buttonelm.onclick = clicAddLink;
+                    div.appendChild(buttonelm);
+                    div2.appendChild(div);
+                }
                 wrap.appendChild(div2);
+                
             }
             content.appendChild(wrap);
         }
@@ -868,9 +1093,9 @@ function clicAddLink() {
     var input1 = document.getElementById("inputPreferenceSource");
     var input2 = document.getElementById("inputPreferenceDestination");
 
-    var type_link = selects[0].selectedIndex ;
-    var source = selects[1].selectedIndex ;
-    var destination = selects[2].selectedIndex ;
+    var type_link = selects[0].options[selects[0].selectedIndex].value; ;
+    var first_node = selects[1].options[selects[1].selectedIndex].value;;
+    var second_node = selects[2].options[selects[2].selectedIndex].value;;
     var name = text.value;
 
     if ( data.idLinkUnused.length >0 ) {
@@ -878,24 +1103,31 @@ function clicAddLink() {
     } else {
          var id_link = data.link.length;
     }
-
-    var weightSrc = input1.value;
-    var weightDest = input2.value;
+    if (type_link == choices.typeLink[0]) {
+        var weightSrc = Number(input1.value);
+        var weightDest = Number(input2.value);
+        var source = Number(first_node);
+        var destination = Number(second_node);
+    } else if (type_link == choices.typeLink[1]) {
+        var weightSrc = Number(input2.value);
+        var weightDest = Number(input1.value);
+        var source = Number(second_node);
+        var destination = Number(first_node);
+    }
+    
     var link_temp = new Link(id_link,type_link,source,destination,name,weightSrc,weightDest);
     data.link.push(link_temp);
     console.log(data.link);
     if (type_link === choices.typeLink[0]) {
-        data.node[source].partner.push(destination);
-        data.node[destination].partner.push(source);
+        data.node[source].partners.push(destination);
+        data.node[destination].partners.push(source);
 
     } else if (type_link === choices.typeLink[1]) {
-        data.node[source].administrator.push(destination);
-        data.node[destination].communityMember.push(source)
+        data.node[destination].administrator.push(destination);
+        data.node[source].communityMember.push(source)
     }
+
 }
-
-
-
 
 function addExample() {
 
@@ -989,7 +1221,9 @@ function modAgCom(nodeId) {
     }
     div.appendChild(selctElm2);
     content.appendChild(div);
-
+    new SlimSelect({
+        select: '#trading'
+    })
 
     // choice of community membership
     var div = document.createElement("div");
@@ -998,6 +1232,7 @@ function modAgCom(nodeId) {
     var selctElm3 = document.createElement("select");
     selctElm3.multiple = "multiple";
     selctElm3.size = 2;
+    selctElm3.id = "community"
     var opt = document.createElement("option");
     opt.setAttribute("value", undefined);
     opt.innerText = 'None';
@@ -1016,6 +1251,11 @@ function modAgCom(nodeId) {
     }
     div.appendChild(selctElm3);
     content.appendChild(div);
+    new SlimSelect({
+        select: '#community'
+    })
+
+
     selctElm2.onchange = function(choice) {
         // choice of community membership
         var div = document.getElementById("Community_membership_old")
@@ -1024,6 +1264,7 @@ function modAgCom(nodeId) {
         var selctElm3 = document.createElement("select");
         selctElm3.multiple = "multiple";
         selctElm3.size = 2;
+        selctElm3.id ="community";
         var opt = document.createElement("option");
         opt.setAttribute("value", '');
         opt.innerText = 'None';
@@ -1044,6 +1285,9 @@ function modAgCom(nodeId) {
         div2.appendChild(selctElm3);
         content.replaceChild(div2,div)
         div2.id = "Community_membership_old";
+        new SlimSelect({
+            select: '#community'
+        })
         
     }
     // save of new data
@@ -1071,7 +1315,16 @@ function modAgCom(nodeId) {
         {
             if (selects[1].options[i].selected) 
             {
-                trading_partners.push(Number(selects[1].options[i].value));
+                trading_partners.push(selects[1].options[i].value);
+            }
+        } 
+        if (trading_partners[0] == 'undefined'){
+            var trading_partners = [];
+        }
+        else 
+        {
+            for (var i=0; i< trading_partners.length; i++) {
+                trading_partners[i] = Number(trading_partners[i])
             }
         }
         
@@ -1080,9 +1333,20 @@ function modAgCom(nodeId) {
         {
             if (selects[2].options[i].selected) 
             {
-                administrators.push(Number(selects[2].options[i].value));
+                administrators.push(selects[2].options[i].value);
             }
-        }   
+        }  
+        if (administrators[0] == 'undefined'){
+            var administrators = [];
+        }
+        else 
+        {
+            for (var i=0; i< administrators.length; i++) {
+                administrators[i] = Number(administrators[i])
+            }
+        }
+        
+
         var name = text.value;
         var id_agent = oldNode.id;
         var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,[],[] );
@@ -1097,7 +1361,10 @@ function modAgCom(nodeId) {
         len = data.link.lenght;
         for(var indice =0; indice < len ; i++) {
             var link = data.link[indice];
-            if (link.source == oldNode.id || link.destination == oldNode.id){
+            console.log(link.source);
+            console.log(oldNode);
+            if (link.source == oldNode.id || link.destination == oldNode.id)
+            {
                 delete data.link[indice];
                 data.idLinkUnused.push(indice);
             }
@@ -1128,13 +1395,433 @@ function modAgCom(nodeId) {
 
 }
 function modLink() {
+    var content = document.getElementById("content");
+    content.innerHTML ="";
 
+    // choice of the type of the link
+    var div = document.createElement("div");
+    div.textContent = "Link type : ";
+    var selctElm1 = document.createElement("select");
+    var opt = document.createElement("option");
+    opt.setAttribute("value", '');
+    opt.innerText = 'Select...';
+    selctElm1.appendChild(opt);
+    for (choice of choices.typeLink){
+        var opt = document.createElement("option");
+        opt.setAttribute("value", choice);
+        opt.innerText = choice;
+        selctElm1.appendChild(opt);
+    }
+    div.appendChild(selctElm1);
+    content.appendChild(div);
+    
+    selctElm1.onchange = function(choice) {
+        this.options[0].disabled = true; // remove the choice select
+        
+        // remove the elements that we don't need on the page
+        var wrapper = document.getElementById("wrap");
+        if (wrapper !== null){
+            content.removeChild(wrapper)
+        } 
+        var wrap = document.createElement("div");
+        wrap.id = "wrap"
+
+       
+        // choice of the first componant
+        var div = document.createElement("div");
+        div.textContent = "Between : ";
+        var selctElm2 = document.createElement("select");
+        var opt = document.createElement("option");
+        opt.setAttribute("value", '');
+        opt.innerText = 'Select...';
+        selctElm2.appendChild(opt);
+        for (node of data.node) {
+            var opt = document.createElement("option");
+            opt.setAttribute("value", node.id);
+            opt.innerText = node.name;
+            selctElm2.appendChild(opt);
+        }
+        
+        div.appendChild(selctElm2);
+        wrap.appendChild(div);
+        
+        
+        selctElm2.onchange = function(choice) {
+            this.options[0].disabled = true; // remove the choice select
+            // remove the elements that we don't need on the page
+            var div2er = document.getElementById("div2");
+            if (div2er !== null){
+                wrap.removeChild(div2er);
+            } 
+            var div2 = document.createElement("div");
+            div2.id = "div2";
+
+
+            // choice of the second componant
+            var div = document.createElement("div");
+            div.textContent = "And : ";
+            var selctElm3 = document.createElement("select");
+            var firstnode = data.node[choice.target.value];
+            var opt = document.createElement("option");
+            opt.setAttribute("value", '');
+            opt.innerText = 'Select...';
+            selctElm3.appendChild(opt);
+            
+            for (link of data.link) {
+                // show only node who have a link with the source
+                if (link.type==selctElm1.options[selctElm1.selectedIndex].value) {
+                    if (link.source == firstnode.id) {
+                        var agent = data.node[link.destination]
+                        var opt = document.createElement("option");
+                        opt.setAttribute("value", link.id); // the value is the link id to find easier the link we change
+                        opt.innerText = agent.name;
+                        selctElm3.appendChild(opt); 
+                    }
+                    else if (link.destination == firstnode.id) {
+                        var agent = data.node[link.source]
+                        var opt = document.createElement("option");
+                        opt.setAttribute("value", link.id);
+                        opt.innerText = agent.name;
+                        selctElm3.appendChild(opt); 
+                    }
+                }  
+            }
+            div.appendChild(selctElm3);
+            div2.appendChild(div);
+            wrap.appendChild(div2);
+
+            selctElm3.onchange = function(choice2) {
+                this.options[0].disabled = true; // remove the choice select
+                var input1 = document.getElementById("preferenceFirstNode");
+                var input2 = document.getElementById("preferenceSecondNode");
+                var input3 = document.getElementById("button_add_link")
+
+                if (input1 !== null){
+                    div2.removeChild(input1)
+                    div2.removeChild(input2)
+                    div2.removeChild(input3)
+                } 
+                var div = document.createElement("div")
+                div.textContent = "Preference of the first node : ";
+                div.id = "preferenceFirstNode"
+                var inputElm = document.createElement("input");
+                inputElm.type = "number";
+                inputElm.step = "any";
+                inputElm.value = 0;
+                inputElm.id = "inputPreferenceFirstNode";
+                inputElm.min = 0;
+                inputElm.placeholder = 0.0;
+
+                div.appendChild(inputElm);
+                div2.appendChild(div);
+
+
+                var div = document.createElement("div")
+                div.textContent = "Preference of the second node : ";
+                div.id = "preferenceSecondNode"
+                var inputElm = document.createElement("input");
+                inputElm.type = "number";
+                inputElm.step = "any";
+                inputElm.id = "InputPreferenceSecondNode";
+                inputElm.min = 0;
+                inputElm.value = 0;
+                inputElm.placeholder = 0.0;
+                div.appendChild(inputElm);
+                div2.appendChild(div);
+
+                // button to save the choice
+                var div = document.createElement("div");
+                div.id = "button_mod_link";
+                var buttonelm = document.createElement("input");
+
+                buttonelm.type = "button";
+                buttonelm.value = "Modify link";
+                buttonelm.onclick = clicModLink;
+                div.appendChild(buttonelm);
+                div2.appendChild(div);
+                wrap.appendChild(div2);
+            }   
+        }
+        content.appendChild(wrap);
+    }
 }
+function clicModLink() {
+    console.log("saving...")
+    var content = document.getElementById("content");
+    var selects = content.getElementsByTagName("select");
+    var input1 = document.getElementById("inputPreferenceFirstNode");
+    var input2 = document.getElementById("InputPreferenceSecondNode");
+
+    var first_node = selects[1].options[selects[1].selectedIndex].value; 
+    var id_link = selects[2].options[selects[2].selectedIndex].value; 
+    var link = data.link[id_link];
+
+    if (first_node == link.source) {
+        link.weightSrc = input1.value;
+        link.weightDest = input2.value;
+    } else if (first_node == link.destination ) {
+        link.weightSrc = input2.value;
+        link.weightDest = input1.value;
+    }
+    data.link[id_link] = link;
+     
+   
+}
+
 function delAgCom() {
+// suprimer un agent ou juste certains de ses assets
+// supprimer la commununity complète ou juste un community manager 
+var content = document.getElementById("content");
+content.innerHTML ="";
+
+
+// choice of the node
+var div = document.createElement("div");
+div.textContent = "Which agent do you want to delete ? " 
+
+var selctElm1 = document.createElement("select");
+var opt = document.createElement("option");
+opt.setAttribute("value", '');
+opt.innerText = 'Select...';
+selctElm1.appendChild(opt);
+for (node of data.node) {
+    var opt = document.createElement("option");
+    opt.setAttribute("value", node.id);
+    opt.innerText = node.name;
+    selctElm1.appendChild(opt);
+}
+div.appendChild(selctElm1);
+content.appendChild(div);
+
+selctElm1.onchange = function(choice) {
+    this.options[0].disabled = true; // remove the choice select
+        
+    // remove the elements that we don't need on the page
+    var wrapper = document.getElementById("wrap");
+    if (wrapper !== null){
+        content.removeChild(wrapper)
+    } 
+    var wrap = document.createElement("div");
+    wrap.id = "wrap"
+
+
+    var agent = choice.target.value;
+    if (agent.type == choices.typeNode[0]) {
+
+        // choice of what we delete
+        var div = document.createElement("div");
+        div.textContent = "What do you want to delete?";
+        var selctElm2 = document.createElement("select");
+        var opt = document.createElement("option");
+        opt.setAttribute("value", '');
+        opt.innerText = 'Select...';
+        selctElm2.appendChild(opt);
+        for (choice of choices.deleteAgent){
+            var opt = document.createElement("option");
+            opt.setAttribute("value", choice);
+            opt.innerText = choice;
+            selctElm2.appendChild(opt);
+        }
+        div.appendChild(selctElm1);
+        wrap.appendChild(div);
+        selctElm2.onchange = function(choice) {
+            // remove the elements that we don't need on the page
+            var wrapper = document.getElementById("wrap2");
+            if (wrapper !== null){
+                wrap.removeChild(wrapper)
+            } 
+            var wrap2 = document.createElement("div");
+            wrap2.id = "wrap2";
+            if (choice.target.value == choices.deleteAgent[1]) {
+                // choice of the assets
+                var div = document.createElement("div");
+                div.textContent = "Which assets do you want to delete?";
+                var selctElm3 = document.createElement("select");
+                selctElm3
+                var opt = document.createElement("option");
+                opt.setAttribute("value", '');
+                opt.innerText = 'Select...';
+                selctElm3.appendChild(opt);
+                for (id_asset of agent.asset) {
+                    var asset = data.asset[id_asset];
+                    var opt = document.createElement("option");
+                    opt.setAttribute("value", asset.id);
+                    opt.innerText = asset.name;
+                    selctElm3.appendChild(opt);
+                }
+                div.appendChild(selctElm3);
+                wrap2.appendChild(div);
+            }
+
+
+        }
+    } else if (agent.type == choices.typeNode[1] ){
+        // choice of what we delete
+        var div = document.createElement("div");
+        div.textContent = "What do you want to delete?";
+        var selctElm2 = document.createElement("select");
+        var opt = document.createElement("option");
+        opt.setAttribute("value", '');
+        opt.innerText = 'Select...';
+        selctElm2.appendChild(opt);
+        for (choice of choices.deleteCom){
+            var opt = document.createElement("option");
+            opt.setAttribute("value", choice);
+            opt.innerText = choice;
+            selctElm2.appendChild(opt);
+        }
+        div.appendChild(selctElm2);
+        wrap.appendChild(div);
+    }
+
 
 }
-function delLink() {
 
+}
+function clicModLink() {
+    console.log("saving...")
+    var content = document.getElementById("content");
+    var selects = content.getElementsByTagName("select");
+    var input1 = document.getElementById("inputPreferenceFirstNode");
+    var input2 = document.getElementById("InputPreferenceSecondNode");
+
+    var first_node = selects[1].options[selects[1].selectedIndex].value; 
+    var id_link = selects[2].options[selects[2].selectedIndex].value; 
+    var link = data.link[id_link];
+
+    if (first_node == link.source) {
+        link.weightSrc = input1.value;
+        link.weightDest = input2.value;
+    } else if (first_node == link.destination ) {
+        link.weightSrc = input2.value;
+        link.weightDest = input1.value;
+    }
+    data.link[id_link] = link;
+     
+   
+}
+
+
+function delLink() {
+    var content = document.getElementById("content");
+    content.innerHTML ="";
+
+    // choice of the type of the link
+    var div = document.createElement("div");
+    div.textContent = "Link type : ";
+    var selctElm1 = document.createElement("select");
+    var opt = document.createElement("option");
+    opt.setAttribute("value", '');
+    opt.innerText = 'Select...';
+    selctElm1.appendChild(opt);
+    for (choice of choices.typeLink){
+        var opt = document.createElement("option");
+        opt.setAttribute("value", choice);
+        opt.innerText = choice;
+        selctElm1.appendChild(opt);
+    }
+    div.appendChild(selctElm1);
+    content.appendChild(div);
+    
+    selctElm1.onchange = function(choice) {
+        this.options[0].disabled = true; // remove the choice select
+        
+        // remove the elements that we don't need on the page
+        var wrapper = document.getElementById("wrap");
+        if (wrapper !== null){
+            content.removeChild(wrapper)
+        } 
+        var wrap = document.createElement("div");
+        wrap.id = "wrap"
+
+       
+        // choice of the first componant
+        var div = document.createElement("div");
+        div.textContent = "Between : ";
+        var selctElm2 = document.createElement("select");
+        var opt = document.createElement("option");
+        opt.setAttribute("value", '');
+        opt.innerText = 'Select...';
+        selctElm2.appendChild(opt);
+        for (node of data.node) {
+            var opt = document.createElement("option");
+            opt.setAttribute("value", node.id);
+            opt.innerText = node.name;
+            selctElm2.appendChild(opt);
+        }
+        
+        div.appendChild(selctElm2);
+        wrap.appendChild(div);
+        
+        
+        selctElm2.onchange = function(choice) {
+            this.options[0].disabled = true; // remove the choice select
+            // remove the elements that we don't need on the page
+            var div2er = document.getElementById("div2");
+            if (div2er !== null){
+                wrap.removeChild(div2er);
+            } 
+            var div2 = document.createElement("div");
+            div2.id = "div2";
+
+
+            // choice of the second componant
+            var div = document.createElement("div");
+            div.textContent = "And : ";
+            var selctElm3 = document.createElement("select");
+            var firstnode = data.node[choice.target.value];
+            var opt = document.createElement("option");
+            opt.setAttribute("value", '');
+            opt.innerText = 'Select...';
+            selctElm3.appendChild(opt);
+            
+            for (link of data.link) {
+                // show only node who have a link with the source
+                console.log(selctElm1.options[selctElm1.selectedIndex].value);
+                if (link.type == selctElm1.options[selctElm1.selectedIndex].value) {
+                    if (link.source == firstnode.id) {
+                        var agent = data.node[link.destination]
+                        var opt = document.createElement("option");
+                        opt.setAttribute("value", link.id); // the value is the link id to find easier the link we change
+                        opt.innerText = agent.name;
+                        selctElm3.appendChild(opt); 
+                    }
+                    else if (link.destination == firstnode.id) {
+                        var agent = data.node[link.source]
+                        var opt = document.createElement("option");
+                        opt.setAttribute("value", link.id);
+                        opt.innerText = agent.name;
+                        selctElm3.appendChild(opt); 
+                    }
+                }  
+            }
+            div.appendChild(selctElm3);
+            div2.appendChild(div);
+            wrap.appendChild(div2);
+
+            // button to save the choice
+            var div = document.createElement("div");
+            div.id = "button_del_link";
+            var buttonelm = document.createElement("input");
+
+            buttonelm.type = "button";
+            buttonelm.value = "Delete link";
+            buttonelm.onclick = clicDelLink;
+            div.appendChild(buttonelm);
+            div2.appendChild(div);
+            wrap.appendChild(div2);
+        }   
+        content.appendChild(wrap);    
+    }
+        
+}
+function clicDelLink() {
+    console.log("deleting...")
+    var content = document.getElementById("content");
+    var selects = content.getElementsByTagName("select");
+    var id_link = selects[2].options[selects[2].selectedIndex].value; 
+    delete data.link[id_link];
+    data.idLinkUnused.push(id_link);
 }
 function save() {
 
@@ -1155,4 +1842,14 @@ function opFile() {
 
 }
 
+function change_onglet(name) {
+    return function() {
+        document.getElementById('onglet_' + data.old_onglet).className = 'onglet_0 onglet';
+        document.getElementById('onglet_'+name).className = 'onglet_1 onglet';
+        document.getElementById('contenu_onglet_'+ data.old_onglet).style.display = 'none';
+        document.getElementById('contenu_onglet_'+name).style.display = 'block';
+        data.old_onglet = name;
+    }
+            
+}
 

@@ -1,0 +1,24 @@
+
+L448
+    // choice of community membership
+    
+    /*var div = document.createElement("div");
+    div.id = "Community_membership_old"
+    var selctElm3 = document.createElement("select");
+    selctElm3.multiple = "multiple";
+    selctElm3.size = 2;
+    var opt = document.createElement("option");
+    opt.setAttribute("value", undefined);
+    opt.innerText = 'None';
+    selctElm3.appendChild(opt);
+    for(admin of data.node) {
+        if(admin.type == choices.typeNode[1]){
+            var opt = document.createElement("option");
+            opt.setAttribute("value", admin.id);
+            opt.innerText = admin.name;
+            selctElm3.appendChild(opt); 
+        }
+        
+    }
+    div.appendChild(selctElm3);
+    content.appendChild(div)*/

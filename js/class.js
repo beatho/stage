@@ -17,7 +17,15 @@ class Node {
 			} 
 		} 
 		
-		this.asset = _asset;
+		this.asset = [];
+		if (_asset.length >= 1) {
+			for (var Asset of _asset) {
+				this.asset.push(Asset);
+			} 
+		} 
+
+
+
 		this.assetActive = _assetActive;
 		// only for a community manager
 		if (this.type == choices.typeNode[1]){
@@ -49,8 +57,9 @@ class Link {
 }
 
 class Asset {
-	constructor(_id,_type, _functionType, _functionCharac, _Pmincap, _Pmaxcap,_Pmint, _Pmaxt, _uncertaintyType, _uncertainCharac, _GPS) {
+	constructor(_id,_name,_type, _functionType, _functionCharac, _Pmincap, _Pmaxcap,_Pmint, _Pmaxt, _uncertaintyType, _uncertainCharac, _GPS) {
 		this.id = _id;
+		this.name = _name;
 		this.type = _type; // Flexible, uncontrollable, uncertain
 		this.functionType = _functionType; // ex : Quadratique
 		this.functionCharac = _functionCharac;

@@ -1,0 +1,14 @@
+{
+  "name": "application_web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "x-tag-polyfilled.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "bea",
+  "license": "ISC",
+  "dependencies": {
+    "slim-select": "^1.21.0"
+  }
+}

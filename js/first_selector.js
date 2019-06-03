@@ -127,7 +127,7 @@ function changeSelect2() {
         //console.log(button);
         wrap.insertBefore(inputElm,button);
         //selects[1].insertAdjacentHTML("afterend",inputElm);
-    } else if (value1 ===options[1].id && value2===options[1].data[1]) {
+    } else if (value1 ===options[1].id && value2 === options[1].data[1]) {
         var selector3 = document.createElement("select");
         selector3.id = "name_node";
         var opt = document.createElement("option");
@@ -135,10 +135,12 @@ function changeSelect2() {
         opt.innerText = 'Select...';
         selector3.appendChild(opt);
         for (agent of data.node) {
-            var opt = document.createElement("option");
-            opt.setAttribute("value", agent.id);
-            opt.innerText = agent.name;
-            selector3.appendChild(opt);
+            if (agent != undefined) {
+                var opt = document.createElement("option");
+                opt.setAttribute("value", agent.id);
+                opt.innerText = agent.name;
+                selector3.appendChild(opt);
+            }
         }
         wrap.insertBefore(selector3,button);
     } else if (value1 === options[1].id && value2 === options[1].data[2]) {
@@ -149,11 +151,13 @@ function changeSelect2() {
         opt.innerText = 'Select...';
         selector4.appendChild(opt);
         for (agent of data.node) {
-            if (agent.type == choices.typeNode[0]){
-                var opt = document.createElement("option");
-                opt.setAttribute("value", agent.id);
-                opt.innerText = agent.name;
-                selector4.appendChild(opt);
+            if (agent != undefined) {
+                if (agent.type == choices.typeNode[0]){
+                    var opt = document.createElement("option");
+                    opt.setAttribute("value", agent.id);
+                    opt.innerText = agent.name;
+                    selector4.appendChild(opt);
+                }
             }
         }
         wrap.insertBefore(selector4,button);
@@ -200,6 +204,7 @@ function clicSelectChoice() {
                 break
                 case options[1].data[1]:
                     var value3 = selects[2].options[selects[2].selectedIndex].value;
+                    console.log(data.node)
                     modAgCom(value3);
                 break
                 case options[1].data[2]:

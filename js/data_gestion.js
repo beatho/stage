@@ -34,7 +34,7 @@ options = [ {
 ]
 
 choices = {
-    typeNode : [ "Agent", "Community Manager"],
+    typeNode : [ "Agent", " Manager"],
     typeLink : [ "Partnership", "Community membership"],
     comObjective : ["Lowest Price", "Autonomy"],
     deleteAgent : ["The agent", "Some of its assets"],

@@ -86,6 +86,9 @@ function clicAddComm(nb_agent) {
         var text2 = document.getElementById("community_member_name");
         var community_objective = selects[0].options[selects[0].selectedIndex].value ; 
         var id_partners = [];
+
+        var nodes = [];
+        var links =[];
         
         for (var i=0; i < selects[1].options.length; i++) 
         {
@@ -130,14 +133,17 @@ function clicAddComm(nb_agent) {
         }
         id_admin = data.node.length;
         var admin = new Node(id_admin,choices.typeNode[1], name_admin, id_partners, [], [], [],community_objective, id_community_merber);
+        
+        nodes.push({ data: { id: id_admin, name: name_admin } });
         data.nodeAdministratorName.push(name_admin);
         data.node.push(admin);
 
+        
         for(var i = 0; i < nb_agent; i++ ) {
             var name = names[i];
             var agent_temp = new Node(data.node.length,choices.typeNode[0],name,[],[id_admin],[],[]);
+            nodes.push({ data: { id: data.node.length, name: name } });
             data.node.push(agent_temp);
-            
             data.nodeAgentName.push(name);
         }
      
@@ -151,6 +157,7 @@ function clicAddComm(nb_agent) {
             }
             var name = 'Link ' + String(data.link.length);
             var link_temp = new Link(id_link,choices.typeLink[0],id_admin,id,name,0,0);
+            links.push({data: { id: 'l'+id_link, source: id_admin, target: id }});
             data.link.push(link_temp);
             var agent_temp = data.node[id];
             agent_temp.partners.push(id_admin);
@@ -165,7 +172,16 @@ function clicAddComm(nb_agent) {
             var name = 'Link ' + String(data.link.length);
             var link_temp = new Link(id_link,choices.typeLink[1],id_admin,id,name,0,0);
             data.link.push(link_temp);
+            links.push({data: { id: 'l'+id_link, source: id_admin, target: id }});
         }
+        // update the graph
+        cy.add(nodes)
+        cy.add(links);
+        cy.center();
+        var layout = cy.elements().layout({
+            name: 'cose'
+          });
+        layout.run();
     } 
 } 
 

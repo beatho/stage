@@ -307,7 +307,7 @@ function addAgent() {
     })
 
     selctElm2.onchange = function(choice) {
-        var buttonelm = document.getElementById("button_add_node")
+        var input = document.getElementById("community_objective")
         var asset = document.getElementById("Number_asset")
         // choice of community membership
 
@@ -351,7 +351,7 @@ function addAgent() {
 
             } else if (selctElm1.options[selctElm1.selectedIndex].value == choices.typeNode[1]) {
                 div2.textContent = "Community membership  :"; 
-                content.insertBefore(div2,buttonelm);
+                content.insertBefore(div2,input);
 } 
         } 
         
@@ -380,6 +380,9 @@ function clicAddNode() {
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
     var inputs = content.getElementsByTagName("input");
+
+    var links = [] // { data: {id :'', source: '', target: '' } },
+
        
     // Create the node
     var type_node = selects[0].options[selects[0].selectedIndex].value;
@@ -410,7 +413,7 @@ function clicAddNode() {
             community.push(selects[2].options[j].value);
         }
     }   
-    
+    console.log(community);
     if (community[0] == 'undefined'){
         community = [];
     } else 
@@ -437,7 +440,7 @@ function clicAddNode() {
 
     
     
-    console.log(community);
+    
     console.log(data.node);
     if (type_node === choices.typeNode[0]) {
         data.nodeAgentName.push(name);
@@ -454,7 +457,9 @@ function clicAddNode() {
          var id_link = data.link.length;
     }
         var link_temp = new Link(id_link,choices.typeLink[0],id_node,id,0,0,'');
+        links.push({data: { id: 'l'+id_link, source: id_node, target: id } });
         data.link.push(link_temp);
+        
     }
     for (id of community) {
         if ( data.idLinkUnused.length >0 ) {
@@ -465,9 +470,12 @@ function clicAddNode() {
         // the source is always the community manager
         if(type_node == choices.typeNode[0]) {
             var link_temp = new Link(id_link,choices.typeLink[0],id,id_node,0,0,'');
+            links.push({data: { id: 'l'+id_link, source: id, target: id_node }});
         } else if (type_node == choices.typeNode[1]) {
             var link_temp = new Link(id_link,choices.typeLink[0],id_node,id,0,0,'');
+            links.push({data: { id: 'l'+id_link, source: id_node, target: id }});
         }
+        
         
         data.link.push(link_temp);
     }
@@ -524,6 +532,19 @@ function clicAddNode() {
         data.asset.push(asset_temp);
     }
     data.node[id_node] = agent_temp;
+
+    // update the graph
+    cy.add({ data: { id: id_node, name: name } })
+    if (links.length >0) {
+        cy.add(links);
+    }
+    cy.center()
+    
+    var layout = cy.elements().layout({
+        name: 'cose'
+        });
+    layout.run();
+    
 }
 
 function checkname(choice) {
@@ -564,6 +585,7 @@ function change_onglet(name) {
 function modAgCom(nodeId) {
     var content = document.getElementById("content");
     var oldNode = data.node[nodeId];
+    
     content.innerHTML ="";
 
     // choice of the type of the node
@@ -595,6 +617,7 @@ function modAgCom(nodeId) {
     textElm.onchange = checkname;
     div.appendChild(textElm);
     content.appendChild(div);
+
     selctElm1.onchange = function(choice) {
         var content = document.getElementById("content");
         var textElm = document.getElementById("node_name");
@@ -656,20 +679,20 @@ function modAgCom(nodeId) {
             content.insertBefore(div,buttonelm);
         }
     }
-    // choice of trading partners
+    // choice of trading partners 
     var div = document.createElement("div");
     div.textContent = "Trading partners : ";
     var selctElm2 = document.createElement("select");
     selctElm2.id = 'trading';
     selctElm2.multiple = "multiple";
-    selctElm2.size = 2;
     var opt = document.createElement("option");
     opt.setAttribute("value", undefined);
     opt.innerText = 'None';
     selctElm2.appendChild(opt);
     for (node of data.node) {
         if (node != undefined){
-            if(node.id =! nodeId){
+            console.log(nodeId);
+            if(node.id != nodeId){
                 var opt = document.createElement("option");
                 opt.setAttribute("value", node.id);
                 opt.innerText = node.name;
@@ -686,11 +709,11 @@ function modAgCom(nodeId) {
     new SlimSelect({
         select: '#trading'
     })
-
+    
     // choice of community membership
     var div = document.createElement("div");
     div.textContent = "Community membership : ";
-    div.id = "Community_membership_old";
+    div.id = "Community_membership";
     var selctElm3 = document.createElement("select");
     selctElm3.multiple = "multiple";
     selctElm3.size = 2;
@@ -772,14 +795,12 @@ function modAgCom(nodeId) {
         div2.textContent = "Community membership : ";
         var selctElm3 = document.createElement("select");
         selctElm3.multiple = "multiple";
-        selctElm3.size = 2;
         selctElm3.id ="community";
         var opt = document.createElement("option");
         opt.setAttribute("value", '');
         opt.innerText = 'None';
         selctElm3.appendChild(opt);
         for(admin of data.node) {
-            
             if((admin.type === choices.typeNode[1]) && (admin.id != choice.target.value)){
                 var opt = document.createElement("option");
                 opt.setAttribute("value", admin.id);
@@ -1135,7 +1156,7 @@ function addAsset(){
     selctElm1.onchange = function() {
         this.options[0].disabled = true;
     }
-    /*  save of new data */
+      /*save of new data */
     var div = document.createElement("div");
     div.id = "button_add_node";
     var buttonelm = document.createElement("input");
@@ -1145,6 +1166,7 @@ function addAsset(){
     buttonelm.onclick = clicAddAsset;
     div.appendChild(buttonelm);
     content.appendChild(div);   
+    
 }
 
 function clicAddAsset(){

@@ -41,10 +41,10 @@ h1
 }
 #cy {
         width: 50%;
-        height: 50%;
+        height: 80%;
         position: absolute;
         left: 50%;
-        top: 15%;
+        top: 20%;
         z-index: 999;
 }
 .cxtmenu-disabled {

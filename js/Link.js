@@ -311,6 +311,7 @@ function clicAddLink() {
     var text = document.getElementById("link_name");
     var inputs = content.getElementsByTagName("input");
     
+    var links = [];
 
     var type_link = selects[0].options[selects[0].selectedIndex].value;
     
@@ -330,13 +331,14 @@ function clicAddLink() {
         var destination = Number(second_node);
         var link_temp = new Link(id_link,type_link,source,destination,name,weightSrc,weightDest);
         data.link.push(link_temp);
-        console.log(data.link);
         
+        links.push({data: { id: 'l'+id_link, source: source, target: destination }});
+
         data.node[source].partners.push(destination);
         data.node[destination].partners.push(source);
 
     } else if (type_link == choices.typeLink[1]) {
-        var admin = Number(second_node);
+        var admin = Number(selects[1].options[selects[1].selectedIndex].value);
         var members = [];
         for (var i=0; i < selects[2].options.length; i++) 
         {
@@ -383,10 +385,19 @@ function clicAddLink() {
             name = 'Link' + String(id_link);
             var link_temp = new Link(id_link,type_link,admin,member,name,weightSrc,weightDest.shift());
             data.link.push(link_temp);
+            links.push({data: { id: 'l'+id_link, source: admin, target: member }});
             data.node[admin].communityMember.push(member);
             data.node[member].administrator.push(admin);
         }
     }
+
+    cy.add(links);
+    cy.center()
+    
+    var layout = cy.elements().layout({
+        name: 'cose'
+        });
+    layout.run();
 
 }
 
@@ -773,14 +784,23 @@ function clicDelLink() {
     var selects = content.getElementsByTagName("select");
     var id_link = selects[2].options[selects[2].selectedIndex].value; 
     var link = data.link[id_link];
+
     if (link.type == choices.typeLink[0]){
         data.node[link.source].partners.splice(data.node[link.source].partners.indexOf(link.destination),1);
         data.node[link.destination].partners.splice(data.node[link.destination].partners.indexOf(link.source),1);
     } else if (link.type == choices.typeLink[1]){
         data.node[link.source].communityMember.splice(data.node[link.source].communityMember.indexOf(link.destination),1);
         data.node[link.destination].administrator.splice(data.node[link.destination].administrator.indexOf(link.source),1);
-
     }
     delete data.link[id_link];
     data.idLinkUnused.push(id_link);
+
+    var id = 'l' + id_link; 
+    var elem = cy.getElementById(id);
+    cy.remove( elem );
+
+    var layout = cy.elements().layout({
+        name: 'cose'
+        });
+    layout.run();
 }

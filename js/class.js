@@ -23,9 +23,6 @@ class Node {
 				this.asset.push(Asset);
 			} 
 		} 
-
-
-
 		this.assetActive = _assetActive;
 		// only for a community manager
 		if (this.type == choices.typeNode[1]){
@@ -36,11 +33,7 @@ class Node {
 					this.communityMember.push(member);
 				}  
 			} 
-
-			
 		}
-		
-
 	}
 }
 

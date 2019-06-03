@@ -9,6 +9,7 @@
   "author": "bea",
   "license": "ISC",
   "dependencies": {
+    "cytoscape": "^3.6.2",
     "slim-select": "^1.21.0"
   }
 }

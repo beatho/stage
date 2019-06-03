@@ -1,0 +1,12 @@
+- slimselectjs:
+	Dropdown multiple selection (light, easy, complete and powerful)
+	url: http://slimselectjs.com/
+- plotly:
+	Nice end-userfriendly charts, but without graph management.
+	url: https://plot.ly/javascript/
+- Cytoscape.js:
+	Powerful chart library with graph management.
+	url: http://js.cytoscape.org/
+- jsnetworkx:
+	Network management.
+	url: http://jsnetworkx.org

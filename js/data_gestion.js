@@ -13,11 +13,11 @@ data = {
 }
 options = [ {
     id: "Add",
-    data: [ "Agent", "Community", "Link", "From example", "From file"]
+    data: [ "Agent", "Community", "Link", "Asset", "From example", "From file"]
 },
 {
     id: "Modify",
-    data: ["Link", "Agent/Community"]
+    data: ["Link", "Agent/Community", "Asset"]
 },
 {
     id: "Delete",

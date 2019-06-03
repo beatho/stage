@@ -39,3 +39,19 @@ h1
         margin:0px;
         padding:0px;
 }
+#cy {
+        width: 50%;
+        height: 50%;
+        position: absolute;
+        left: 50%;
+        top: 15%;
+        z-index: 999;
+}
+.cxtmenu-disabled {
+        opacity: 0.333;
+}
+
+#content {
+        width: 50%;
+       
+}

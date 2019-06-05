@@ -381,7 +381,7 @@ function clicAddNode() {
     var selects = content.getElementsByTagName("select");
     var inputs = content.getElementsByTagName("input");
 
-    var links = [] // { data: {id :'', source: '', target: '' } },
+    var links = []; // { data: {id :'', source: '', target: '' } },
 
        
     // Create the node
@@ -442,12 +442,7 @@ function clicAddNode() {
     
     
     console.log(data.node);
-    if (type_node === choices.typeNode[0]) {
-        data.nodeAgentName.push(name);
-    } else if ( type_node === choices.typeNode[1] ) {
-        data.nodeAdministratorName.push(name);
-    }
-    
+       
     
     // create the links 
     for (id of trading_partners) {
@@ -521,7 +516,8 @@ function clicAddNode() {
         if (k < choices.nbFeature[function_type]){
             number = Number(feat_temps);
             if (number != number) {
-            console.log("Warning it was not the good syntax")
+                console.log("Warning it was not the good syntax");
+                number =0;
             }
             feat.push(number);
         }
@@ -529,7 +525,7 @@ function clicAddNode() {
         
 
         var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
-        data.asset.push(asset_temp);
+        data.asset[id_asset] = asset_temp;
     }
     data.node[id_node] = agent_temp;
 
@@ -545,26 +541,24 @@ function clicAddNode() {
         });
     layout.run();
     
+    // update the page 
+    addAgent();
 }
 
 function checkname(choice) {
     //var text = document.getElementById("node_name");
-    var node_name = choice.target.value;
-    for (name of data.nodeAgentName ) {
-        if (name === node_name){
+    if (choice.target == undefined){
+        var node_name = choice;
+    } else {
+        var node_name = choice.target.value;
+    }
+    for (node of data.node ) {
+        if (node_name === node.name){
             console.log("Beware name already used");
-            break;
+            return true;
         }
     }
-    for (name of data.nodeAdministratorName) {
-        if (name === node_name){
-            console.log("Beware name already used");
-            break;
-        }
-    }
-    
-    
-   
+    return false
 }
 
 
@@ -790,7 +784,7 @@ function modAgCom(nodeId) {
 
     selctElm2.onchange = function(choice) {
         // choice of community membership
-        var div = document.getElementById("Community_membership_old")
+        var div = document.getElementById("Community_membership")
         var div2 = document.createElement("div");
         div2.textContent = "Community membership : ";
         var selctElm3 = document.createElement("select");
@@ -814,7 +808,7 @@ function modAgCom(nodeId) {
         }
         div2.appendChild(selctElm3);
         content.replaceChild(div2,div)
-        div2.id = "Community_membership_old";
+        div2.id = "Community_membership";
         new SlimSelect({
             select: '#community'
         })
@@ -827,99 +821,118 @@ function modAgCom(nodeId) {
 
     buttonelm.type = "button";
     buttonelm.value = "Add node";
-    buttonelm.onclick = clicModNode;
+    buttonelm.onclick = clicModNode(nodeId);
     div.appendChild(buttonelm);
     content.appendChild(div);   
  
 }
 
-function clicModNode() {
-    console.log('Saving...')
-    var content = document.getElementById("content");
-    var selects = content.getElementsByTagName("select");
-    var text = document.getElementById("node_name");
-    var type_node = selects[0].options[selects[0].selectedIndex].value;
-    
-    var trading_partners = [];
-    for (var i=0; i < selects[1].options.length; i++) 
-    {
-        if (selects[1].options[i].selected) 
-        {
-            trading_partners.push(selects[1].options[i].value);
-        }
-    } 
-    if (trading_partners[0] == 'undefined'){
-        var trading_partners = [];
-    }
-    else 
-    {
-        for (var i=0; i< trading_partners.length; i++) {
-            trading_partners[i] = Number(trading_partners[i])
-        }
-    }
-    
-    var administrators = [];
-    for (var i=0; i < selects[2].options.length; i++) 
-    {
-        if (selects[2].options[i].selected) 
-        {
-            administrators.push(selects[2].options[i].value);
-        }
-    }  
-    if (administrators[0] == 'undefined'){
-        var administrators = [];
-    }
-    else 
-    {
-        for (var i=0; i< administrators.length; i++) {
-            administrators[i] = Number(administrators[i])
-        }
-    }
-    
+function clicModNode(nodeId) {
+    return function() {
+        console.log('Saving...')
+        var content = document.getElementById("content");
+        var selects = content.getElementsByTagName("select");
+        var text = document.getElementById("node_name");
 
-    var name = text.value;
-    var id_agent = oldNode.id;
-    var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,[],[] );
-    data.node[id_agent] = agent_temp;
-    console.log(data.node);
-    if (type_node === choices.typeNode[0]) {
-        data.nodeAgentName.push(name);
-    } else if ( type_node === choices.typeNode[1] ) {
-        data.nodeAdministratorName.push(name);
-    }
-    // remove the old links
-    len = data.link.lenght;
-    for(var indice =0; indice < len ; i++) {
-        var link = data.link[indice];
-        console.log(link.source);
-        console.log(oldNode);
-        if (link.source == oldNode.id || link.destination == oldNode.id)
+        var name = text.value;
+        var id_agent = Number(nodeId);
+
+
+        // remove the old element
+
+        hDelAgent(id_agent);
+        data.idNodeUnused.pop(); // we must keep the id as used 
+            
+        // create the new element
+
+        var type_node = selects[0].options[selects[0].selectedIndex].value;
+        
+        var trading_partners = [];
+        for (var i=0; i < selects[1].options.length; i++) 
         {
-            delete data.link[indice];
-            data.idLinkUnused.push(indice);
+            if (selects[1].options[i].selected) 
+            {
+                trading_partners.push(selects[1].options[i].value);
+            }
+        } 
+        if (trading_partners[0] == 'undefined'){
+            var trading_partners = [];
         }
-    }
-    // create the new links 
-    for (id of trading_partners) {
-        if ( data.idLinkUnused.length >0 ) {
-            id_link = data.idLinkUnused.shift();                
-        } else {
-             var id_link = data.link.length;
+        else 
+        {
+            for (var i=0; i< trading_partners.length; i++) {
+                trading_partners[i] = Number(trading_partners[i])
+            }
         }
-       
-        var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
-        data.link.push(link_temp);
-    }
-    for (id of administrators) {
-        if ( data.idLinkUnused.length >0 ) {
-            id_link = data.idLinkUnused.shift();                
-        } else {
-             var id_link = data.link.length;
+        
+        var administrators = [];
+        for (var i=0; i < selects[2].options.length; i++) 
+        {
+            if (selects[2].options[i].selected) 
+            {
+                administrators.push(selects[2].options[i].value);
+            }
+        }  
+        if (administrators[0] == 'undefined'){
+            var administrators = [];
         }
-        var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,0,0,'');
-        data.link.push(link_temp);
+        else 
+        {
+            for (var i=0; i< administrators.length; i++) {
+                administrators[i] = Number(administrators[i])
+            }
+        }
+        
+
+
+        var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,[],[] );
+        data.node[id_agent] = agent_temp;
+        //console.log(data.node);
+        if (type_node === choices.typeNode[0]) {
+            data.nodeAgentName.push(name);
+        } else if ( type_node === choices.typeNode[1] ) {
+            data.nodeAdministratorName.push(name);
+        }
+        
+
+        // create the new links 
+        var links = [];
+        for (id of trading_partners) {
+            if ( data.idLinkUnused.length >0 ) {
+                id_link = data.idLinkUnused.shift();                
+            } else {
+                var id_link = data.link.length;
+            }
+            var name_link = 'Link ' + String(id_link);
+            var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,name_link,0,0);
+            data.link[id_link] = link_temp;
+            links.push({data: { id: 'l'+ id_link, source: id_agent, target: id }});
+        }
+        for (id of administrators) {
+            if ( data.idLinkUnused.length >0 ) {
+                id_link = data.idLinkUnused.shift();                
+            } else {
+                var id_link = data.link.length;
+            }
+            var name_link = 'Link ' + String(id_link);
+            var link_temp = new Link(id_link,choices.typeLink[1],id_agent,id,name_link,0,0);
+            data.link[id_link] = link_temp;
+            links.push({data: { id: 'l'+id_link, source: id_agent, target: id  }});
+        }
+        // update the graphe
+        cy.add({ data: { id: id_agent, name: name } })
+        cy.add(links);
+        cy.center()
+        
+        var layout = cy.elements().layout({
+            name: 'cose'
+            });
+        layout.run();
+
+        // update the page
+
+        modAgCom(nodeId)
     }
-    //
 }
 
 function addAsset(){
@@ -1225,7 +1238,9 @@ function clicAddAsset(){
         data.asset.push(asset_temp);
         
     }
+    // update the page
 
+    addAsset();
 }
 
 function modAsset(nodeId){
@@ -1420,17 +1435,19 @@ function clicModAsset(nodeId) {
             var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
             data.asset[id_asset] = asset_temp;
         }
-
+    
+    // update the page
+    modAsset(nodeId)
     }
     
 }
 
-function delAgCom() {
+function delAgCom(NodeId = undefined) {
 // suprimer un agent ou juste certains de ses assets
 // supprimer la commununity complète ou juste un community manager 
     var content = document.getElementById("content");
     content.innerHTML ="";
-
+   
 
     // choice of the node
     var div = document.createElement("div");
@@ -1440,19 +1457,105 @@ function delAgCom() {
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
     opt.innerText = 'Select...';
-    selctElm1.appendChild(opt);
+    if (NodeId == undefined){
+        selctElm1.appendChild(opt);
+    }
     for (node of data.node) {
         if (node != undefined){
             var opt = document.createElement("option");
             opt.setAttribute("value", node.id);
             opt.innerText = node.name;
             selctElm1.appendChild(opt);
+            if (NodeId != undefined){
+                if (NodeId == node.id){
+                    opt.selected = true;
+                }
+            }
+        
         }
         
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    if (NodeId != undefined){
+        var wrap = document.createElement("div");
+        wrap.id = "wrap"
 
+
+        var agent_id = NodeId
+        var agent = data.node[agent_id];
+        if (agent.type == choices.typeNode[0]) {
+
+            // choice of what we delete
+            var div = document.createElement("div");
+            div.textContent = "What do you want to delete?";
+            var selctElm2 = document.createElement("select");
+            var opt = document.createElement("option");
+            opt.setAttribute("value", '');
+            opt.innerText = 'Select...';
+            selctElm2.appendChild(opt);
+            for (choice of choices.deleteAgent){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", choice);
+                opt.innerText = choice;
+                selctElm2.appendChild(opt);
+            }
+            div.appendChild(selctElm2);
+            wrap.appendChild(div);
+            selctElm2.onchange = function(choice) {
+                // remove the elements that we don't need on the page
+                var wrapper = document.getElementById("wrap2");
+                if (wrapper !== null){
+                    wrap.removeChild(wrapper)
+                } 
+                var wrap2 = document.createElement("div");
+                wrap2.id = "wrap2";
+                if (choice.target.value == choices.deleteAgent[1]) {
+                    // choice of the assets
+                    var div = document.createElement("div");
+                    div.textContent = "Which assets do you want to delete?";
+                    var selctElm3 = document.createElement("select");
+                    selctElm3.multiple = "multiple";
+                    selctElm3.id ="delete_asset";
+                    for (id_asset of agent.asset) {
+                        var asset = data.asset[id_asset];
+                        if (asset != undefined) {
+                            var opt = document.createElement("option");
+                            opt.setAttribute("value", asset.id);
+                            opt.innerText = asset.name;
+                            selctElm3.appendChild(opt);
+                        }
+                        
+                    }
+                    div.appendChild(selctElm3);
+                    wrap2.appendChild(div);
+                    wrap.appendChild(wrap2);
+                    new SlimSelect({
+                        select: '#delete_asset'
+                    })
+                }
+            }
+
+        } else if (agent.type == choices.typeNode[1] ){
+            // choice of what we delete
+            var div = document.createElement("div");
+            div.textContent = "What do you want to delete?";
+            var selctElm2 = document.createElement("select");
+            var opt = document.createElement("option");
+            opt.setAttribute("value", '');
+            opt.innerText = 'Select...';
+            selctElm2.appendChild(opt);
+            for (choice of choices.deleteCom){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", choice);
+                opt.innerText = choice;
+                selctElm2.appendChild(opt);
+            }
+            div.appendChild(selctElm2);
+            wrap.appendChild(div);
+        }
+        content.appendChild(wrap)
+    }
     selctElm1.onchange = function(choice) {
         this.options[0].disabled = true; // remove the choice select
         var buttonelm = document.getElementById("button_del_node")
@@ -1557,7 +1660,7 @@ function delAgCom() {
      content.appendChild(div);   
 }
 function clicDelNode(){
-    console.log('Saving...')
+    console.log('deleting...')
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
     
@@ -1566,6 +1669,7 @@ function clicDelNode(){
     var choice = selects[1].options[selects[1].selectedIndex].value;
 
     if (node.type == choices.typeNode[0]) {
+        
         if (choice ==choices.deleteAgent[0]){
             hDelAgent(id_node)
         } 
@@ -1583,53 +1687,84 @@ function clicDelNode(){
         }
 
     } 
-    else if (node.type == choices.typeNode[0]){
-        if (choice ==choices.deleteCom[0]){
+    else if (node.type == choices.typeNode[1]){
+        if (choice ==choices.deleteCom[1]){
             hDelAgent(id_node)
         }
 
-    } else if (choice ==choices.deleteCom[1]) {
-        var manager = data.node[id_node];
-
-        for (member of manager.communityMember){
-            hDelAgent(member)
+        else if (choice ==choices.deleteCom[0]) {
+            var manager = data.node[id_node];
+            
+            while (manager.communityMember.length >0) {
+                member = manager.communityMember.shift();
+                hDelAgent(member);
+            }
+            hDelAgent(id_node)
+            
         }
 
-        hDelAgent(id_node)
-
     }
+
+    // Update the graph
+    cy.center()
+    
+    var layout = cy.elements().layout({
+        name: 'cose'
+        });
+    layout.run();
+    
+    // update the page
+    delAgCom();
+
 }
 
 function hDelLinks(id_node) {
     for (link of data.link) {
-        if (link.source == id_node || link.destination == id_node){
-            var id_link = link.id;
-            delete data.link[id_link];
-            data.idLinkUnused.push(id_link);
+        if (link !=undefined) {
+            if (link.source == id_node || link.destination == id_node){
+                var id_link = link.id;
+                delete data.link[id_link];
+                data.idLinkUnused.push(id_link);
+                var edge = cy.getElementById('l'+id_link);
+                cy.remove(edge);
+            }
         }
+        
     }
 }
 function hDelAgent(id_node) {
+    
     var agent = data.node[id_node];
-    for (partner of agent.partners) {
-        data.node[partner].partners.splice(data.node[partner].partners.indexOf(id_node),1);
-    }
-    for (admin of agent.administrator){
-        data.node[admin].communityMember.splice(data.node[admin].communityMember.indexOf(id_node),1);
-    }
-
-    if(data.node[id_node].type == choices.typeNode[1]) {
-        for (member of agent.communityMember){
-            data.node[member].administrator.splice(data.node[member].administrator.indexOf(id_node),1);
+    if (agent != undefined) {
+        for (partner of agent.partners) {
+            if ( data.node[partner].partners.indexOf(id_node) != -1 ) {
+                data.node[partner].partners.splice(data.node[partner].partners.indexOf(id_node),1);
+            }
         }
+        for (admin of agent.administrator){
+            if ( data.node[admin].communityMember.indexOf(id_node) != -1 ) {
+                data.node[admin].communityMember.splice(data.node[admin].communityMember.indexOf(id_node),1);
+            }
+        }
+        if(data.node[id_node].type == choices.typeNode[1]) {
+            for (member of agent.communityMember){
+                if (data.node[member].administrator.indexOf(id_node) != -1 ) {
+                    data.node[member].administrator.splice(data.node[member].administrator.indexOf(id_node),1);
+                }
+            }
+        }
+    
+        hDelLinks(id_node);
+    
+        for (asset of agent.asset ){
+            delete data.asset[asset];
+            data.idAssetUnused.push(asset)
+        }
+        delete data.node[id_node];
+        data.idNodeUnused.push(id_node);
+        var node = cy.getElementById(String(id_node));
+        cy.remove(node);
     }
 
-    hDelLinks(id_node)
-
-    for (asset of agent.asset ){
-        delete data.asset[asset];
-        data.idAssetUnused.push(asset)
-    }
-    delete data.node[id_node];
-    data.idNodeUnused.push(id_node);
+    
 }

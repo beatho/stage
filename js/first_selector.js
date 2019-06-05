@@ -5,16 +5,11 @@
 
 window.addEventListener("load",function()
 {   
-    
-
     var wrap = document.getElementById("first_selection");
     wrap.textContent = "Actions : ";
     wrap.appendChild(document.createElement("br"));
     
-    var selector = document.createElement("select");
-
-    
-        
+    var selector = document.createElement("select");     
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
     opt.innerText = 'Select...';
@@ -29,9 +24,29 @@ window.addEventListener("load",function()
                 selector.appendChild(opt);
             }
     wrap.appendChild(selector);
-    counter = 0;
     selector.onchange = function(choice) {
         this.options[0].disabled = true;
+        // remove the element that we don't need on the page
+        var select1 = document.getElementById("name_node");
+        var select2 = document.getElementById("name_agent");
+        var input = document.getElementById("nb_agent");
+        if (input !== null){
+            wrap.removeChild(input);
+        } else if (select1 !==null) {
+            wrap.removeChild(select1);
+        } else if (select2 !==null) {
+            wrap.removeChild(select2);
+        }
+        var select = document.getElementsByTagName("select")[1];
+        if (select != null){
+            wrap.removeChild(select);
+        }
+        var button = document.getElementById("button_select");
+        if (button != null){
+            wrap.removeChild(button)
+        } 
+
+
         //console.log(choice.target.value)
         for (var option of options)
             {
@@ -52,44 +67,12 @@ window.addEventListener("load",function()
                     opt.innerText = dat;
                     selector2.appendChild(opt); 
                 }
-                if (counter == 0) {
-                    //console.log("ok");
-                    
-                    buttonelm.type = "button";
-                    buttonelm.value = "Select";
-                    buttonelm.id = "button_select";
-                    buttonelm.onclick = clicSelectChoice;
-                    
-                    
-                    wrap.appendChild(selector2);
-                    wrap.appendChild(buttonelm);
-                    counter = 1;
-                    //button = document.getElementById("button_select");  
-                    //buttonelm.addEventListener("onclick", clic());
-                    //buttonelm.setAttribute("onclick", clic());
-                    
-                   
-                } else 
-                {
-                    var test = document.getElementsByTagName("select")[1];
-                    //console.log(test);
-                    wrap.replaceChild(selector2,test);
-                } 
-            }
-            }
-            // remove the element that we don't need on the page
-            var select1 = document.getElementById("name_node");
-            var select2 = document.getElementById("name_agent");
-            var input = document.getElementById("nb_agent");
-            if (input !== null){
-                wrap.removeChild(input);
-            } else if (select1 !==null) {
-                wrap.removeChild(select1);
-            } else if (select2 !==null) {
-                wrap.removeChild(select2);
+                wrap.appendChild(selector2);
             }
         } 
 
+
+    }
 
 });
 
@@ -112,6 +95,9 @@ function changeSelect2() {
     } else if (select2 !==null) {
         wrap.removeChild(select2);
     }
+    if (button != null){
+        wrap.removeChild(button)
+    } 
 
 
 
@@ -123,10 +109,10 @@ function changeSelect2() {
         inputElm.min = 1;
         inputElm.value = 3;
         inputElm.required = "required";
-        //console.log(inputElm);
-        //console.log(button);
-        wrap.insertBefore(inputElm,button);
-        //selects[1].insertAdjacentHTML("afterend",inputElm);
+        
+        wrap.appendChild(inputElm);
+
+        
     } else if (value1 ===options[1].id && value2 === options[1].data[1]) {
         var selector3 = document.createElement("select");
         selector3.id = "name_node";
@@ -142,7 +128,7 @@ function changeSelect2() {
                 selector3.appendChild(opt);
             }
         }
-        wrap.insertBefore(selector3,button);
+        wrap.appendChild(selector3);
     } else if (value1 === options[1].id && value2 === options[1].data[2]) {
         var selector4 = document.createElement("select");
         selector4.id = "name_agent";
@@ -160,8 +146,23 @@ function changeSelect2() {
                 }
             }
         }
-        wrap.insertBefore(selector4,button);
+        wrap.appendChild(selector4);
+    } 
+    if ((value1 === options[4].id && value2 === options[4].data[2])||(value1 === options[0].id && value2 === options[0].data[5]))  {
+        var buttonelm = document.createElement("input");
+        buttonelm.type = "file";
+        buttonelm.id = "button_select";
+        buttonelm.onchange = clicSelectChoice;
+        //buttonelm.onchange = opFile(buttonelm);
+        wrap.appendChild(buttonelm);
 
+    } else {
+        var buttonelm = document.createElement("input");
+        buttonelm.type = "button";
+        buttonelm.value = "Select";
+        buttonelm.id = "button_select";
+        buttonelm.onclick = clicSelectChoice;
+        wrap.appendChild(buttonelm);
     }
     
 
@@ -193,7 +194,7 @@ function clicSelectChoice() {
                     addExample();
                 break
                 case options[0].data[5]:
-                    addFile();
+                    addFile(this);
                 break
             }
             break
@@ -242,7 +243,7 @@ function clicSelectChoice() {
                         opExample();
                     break
                     case options[4].data[2]:
-                        opFile();
+                        opFile(this);
                     break
                 }
         break

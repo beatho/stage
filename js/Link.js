@@ -19,16 +19,6 @@ function addLink() {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
-   
-    // choice of the name
-    var div = document.createElement("div");
-    div.textContent = "Link name : ";
-    var textElm = document.createElement("input");
-    textElm.id = "link_name";
-    textElm.type = "text";
-    textElm.value = 'Link ' + String(data.link.length);
-    div.appendChild(textElm);
-    content.appendChild(div);
     
     selctElm1.onchange = function(choice) {
         this.options[0].disabled = true; // remove the choice select
@@ -61,7 +51,6 @@ function addLink() {
             div.appendChild(selctElm2);
             wrap.appendChild(div);
             
-            
             selctElm2.onchange = function(choice) {
                 this.options[0].disabled = true; // remove the choice select
                 // remove the elements that we don't need on the page
@@ -73,24 +62,24 @@ function addLink() {
                 div2.id = "div2";
 
 
-                // choice of the destination
+                // choice of the new community members
                 var div = document.createElement("div");
-                div.textContent = "destination : ";
+                div.textContent = "New community members : ";
                 var selctElm3 = document.createElement("select");
+                selctElm3.id = 'members';
+                selctElm3.multiple = "multiple";
+                selctElm3.size = 2;
+
                 var source = data.node[choice.target.value];
                 var opt = document.createElement("option");
-                opt.setAttribute("value", '');
-                opt.innerText = 'Select...';
+                opt.setAttribute("value", 'All');
+                opt.innerText = 'All';
                 selctElm3.appendChild(opt);
-                //console.log(source.partners);
-                //console.log(source.administrator);
                 for (agent of data.node) {
                     // show only node who don't have a link with the source
                     if (agent != undefined){
                         if ( source.id != agent.id){
-                        
                             if ( source.type === choices.typeNode[0] && source.partners.indexOf(agent.id) == -1 && source.administrator.indexOf(agent.id) == -1){
-                                
                                 //console.log(agent.id)
                                 var opt = document.createElement("option");
                                 opt.setAttribute("value", agent.id);
@@ -108,10 +97,14 @@ function addLink() {
                 }
                 div.appendChild(selctElm3);
                 div2.appendChild(div);
-                wrap.appendChild(div2);
 
                 selctElm3.onchange = function(choice2) {
-                    this.options[0].disabled = true; // remove the choice select
+                    if (this.options[0].selected){
+                        for (opt of this.options){
+                            opt.selected = true;
+                        }
+                    }
+                    
                     var input1 = document.getElementById("preferenceSource");
                     var input2 = document.getElementById("preferenceDestination");
                     var input3 = document.getElementById("button_add_link")
@@ -137,15 +130,26 @@ function addLink() {
 
 
                     var div = document.createElement("div")
-                    div.textContent = "Preference of the destination : ";
+                    div.textContent = "Preference of the destinations : ";
                     div.id = "preferenceDestination"
                     var inputElm = document.createElement("input");
-                    inputElm.type = "number";
-                    inputElm.step = "any";
+                    inputElm.type = "text";
                     inputElm.id = "inputPreferenceDestination";
-                    inputElm.min = 0;
-                    inputElm.value = 0;
-                    inputElm.placeholder = 0.0;
+
+                    var nb_members = 0;
+                    for (var i=1; i < this.options.length; i++) 
+                    {
+                        if (this.options[i].selected) 
+                        {
+                            nb_members = nb_members +1;
+                        }
+                    }
+
+                    var Chain = '0 ;';
+                    for (var indice =1; indice < nb_members; indice ++) {
+                        Chain = Chain + ' 0 ;';
+                    }
+                    inputElm.value = Chain;
                     div.appendChild(inputElm);
                     div2.appendChild(div);
 
@@ -155,13 +159,18 @@ function addLink() {
                     var buttonelm = document.createElement("input");
 
                     buttonelm.type = "button";
-                    buttonelm.value = "Add link";
+                    buttonelm.value = "Add links";
                     buttonelm.onclick = clicAddLink;
                     div.appendChild(buttonelm);
                     div2.appendChild(div);
-                    wrap.appendChild(div2);
                 }
+                wrap.appendChild(div2);
+                new SlimSelect({
+                    select: '#members'
+                })
+                
             }
+            
             content.appendChild(wrap);
             
 
@@ -172,8 +181,8 @@ function addLink() {
             var selctElm2 = document.createElement("select");
             
             var opt = document.createElement("option");
-            opt.setAttribute("value", '');
-            opt.innerText = 'Select...';
+            opt.setAttribute("value", 'All');
+            opt.innerText = 'All';
             selctElm2.appendChild(opt);
             for (admin of data.node) {
                 if (admin != undefined){
@@ -234,7 +243,11 @@ function addLink() {
                 div2.appendChild(div);
 
                 selctElm3.onchange = function(choice2) {
-                    this.options[0].disabled = true; // remove the choice select
+                    if (this.options[0].selected){
+                        for (opt of this.options){
+                            opt.selected = true;
+                        }
+                    } // remove the choice select
                     var input1 = document.getElementById("preferenceSource");
                     var input2 = document.getElementById("preferenceDestination");
                     var input3 = document.getElementById("button_add_link")
@@ -308,88 +321,72 @@ function clicAddLink() {
     console.log("saving...")
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
-    var text = document.getElementById("link_name");
     var inputs = content.getElementsByTagName("input");
     
     var links = [];
 
     var type_link = selects[0].options[selects[0].selectedIndex].value;
     
-    if (type_link == choices.typeLink[0]) {
-        var first_node = selects[1].options[selects[1].selectedIndex].value;
-        var second_node = selects[2].options[selects[2].selectedIndex].value;
-        var name = text.value;
-
+    
+    var source = Number(selects[1].options[selects[1].selectedIndex].value);
+    var members = [];
+    for (var i=1; i < selects[2].options.length; i++) 
+    {
+        if (selects[2].options[i].selected) 
+        {
+            members.push(Number(selects[2].options[i].value));
+        }
+    }
+    var weightSrc = Number(inputs[1].value);
+    var chain_weightDest =inputs[2].value;
+    var weightDest =[];
+    var weightDest_temp ='';
+    k = 0;
+    for (chiffre of chain_weightDest) {
+        if (k < members.length) {
+            if (chiffre !== ';') {
+                weightDest_temp = weightDest_temp + chiffre;
+            } else {
+                number = Number(weightDest_temp);
+                if (number != number) {
+                    console.log("Warning it was not the good syntax, preference set at 0");
+                    number = 0;
+                }
+                weightDest.push(number);
+                weightDest_temp = '';
+                k = k+1;
+            }
+        }
+    }
+    if (k < members.length){
+        number = Number(weightDest_temp);
+        if (number != number) {
+            console.log("Warning it was not the good syntax preference set at 0");
+            number = 0;
+        }
+        weightDest.push(number);
+    }
+    
+    for (member of members) {
         if ( data.idLinkUnused.length >0 ) {
             var id_link = data.idLinkUnused.shift();                
         } else {
             var id_link = data.link.length;
         }
-        var weightSrc = Number(inputs[1].value);
-        var weightDest = Number(inputs[2].value);
-        var source = Number(first_node);
-        var destination = Number(second_node);
-        var link_temp = new Link(id_link,type_link,source,destination,name,weightSrc,weightDest);
+        name = 'Link' + String(id_link);
+        var link_temp = new Link(id_link,type_link,source,member,name,weightSrc,weightDest.shift());
         data.link.push(link_temp);
-        
-        links.push({data: { id: 'l'+id_link, source: source, target: destination }});
-
-        data.node[source].partners.push(destination);
-        data.node[destination].partners.push(source);
-
-    } else if (type_link == choices.typeLink[1]) {
-        var admin = Number(selects[1].options[selects[1].selectedIndex].value);
-        var members = [];
-        for (var i=0; i < selects[2].options.length; i++) 
-        {
-            if (selects[2].options[i].selected) 
-            {
-                members.push(Number(selects[2].options[i].value));
-            }
-        }
-        var weightSrc = Number(inputs[1].value);
-        var chain_weightDest =inputs[2].value;
-        var weightDest =[];
-        var weightDest_temp ='';
-        k = 0;
-        for (chiffre of chain_weightDest) {
-            if (k < members.length) {
-                if (chiffre !== ';') {
-                    weightDest_temp = weightDest_temp + chiffre;
-                } else {
-                    number = Number(weightDest_temp);
-                    if (number != number) {
-                        console.log("Warning it was not the good syntax, preference set at 0");
-                        number = 0;
-                    }
-                    weightDest.push(number);
-                    weightDest_temp = '';
-                    k = k+1;
-                }
-            }
-        }
-        if (k < members.length){
-            number = Number(weightDest_temp);
-            if (number != number) {
-                console.log("Warning it was not the good syntax preference set at 0");
-                number = 0;
-            }
-            weightDest.push(number);
-        }
-        for (member of members) {
-            if ( data.idLinkUnused.length >0 ) {
-                var id_link = data.idLinkUnused.shift();                
-            } else {
-                var id_link = data.link.length;
-            }
-            name = 'Link' + String(id_link);
-            var link_temp = new Link(id_link,type_link,admin,member,name,weightSrc,weightDest.shift());
-            data.link.push(link_temp);
-            links.push({data: { id: 'l'+id_link, source: admin, target: member }});
-            data.node[admin].communityMember.push(member);
-            data.node[member].administrator.push(admin);
+        links.push({data: { id: 'l'+id_link, source: source, target: member }});
+        if (type_link == choices.typeLink[1]){
+            data.node[source].communityMember.push(member);
+            data.node[member].administrator.push(source);
+        } else if (type_link == choices.typeLink[0]){ 
+            data.node[source].partners.push(member);
+            data.node[member].partners.push(source);
         }
     }
+    
+    // update the graph
 
     cy.add(links);
     cy.center()
@@ -399,6 +396,9 @@ function clicAddLink() {
         });
     layout.run();
 
+    // update the page
+
+    addLink();
 }
 
 function modLink(linkId = undefined ) {
@@ -452,7 +452,7 @@ function modLink(linkId = undefined ) {
         div.textContent = "And : ";
         var selctElm3 = document.createElement("select");
         var opt = document.createElement("option");
-        opt.setAttribute("value", oldLink.destination);
+        opt.setAttribute("value", oldLink.id);
         var destination = data.node[oldLink.destination];
         opt.innerText = destination.name ;
         selctElm3.appendChild(opt);
@@ -655,8 +655,11 @@ function clicModLink() {
         link.weightSrc = input2.value;
         link.weightDest = input1.value;
     }
+    console.log(link)
     data.link[id_link] = link;
-     
+    
+    // update the page
+    modLink()
    
 }
 
@@ -795,6 +798,7 @@ function clicDelLink() {
     delete data.link[id_link];
     data.idLinkUnused.push(id_link);
 
+    // update the graph
     var id = 'l' + id_link; 
     var elem = cy.getElementById(id);
     cy.remove( elem );
@@ -803,4 +807,10 @@ function clicDelLink() {
         name: 'cose'
         });
     layout.run();
+
+    // update the page
+
+    delLink();
+
+
 }

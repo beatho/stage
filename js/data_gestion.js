@@ -1,7 +1,5 @@
 
 data = {
-    nodeAgentName: [],
-    nodeAdministratorName: [],
     link: [],
     asset: [],
     node: [],
@@ -41,5 +39,6 @@ choices = {
     deleteCom : ["All Community", "Only the community manager"],
     typeAsset : ["Flexible", "uncontrollable", "uncertain"],
     functionType : ["Quadratic"],
-    nbFeature : {"Quadratic" : 3}
+    nbFeature : {"Quadratic" : 3},
+    examples : ["Community", "PtoP"]
 }

@@ -45,19 +45,17 @@ window.addEventListener('DOMContentLoaded', function(){
     }*/
     });
     cy.cxtmenu({
-        selector: 'node, edge',
+        selector: 'edge',
 
         commands: [
             {
                 content: 'modify',
                 select: function(ele){
-                    console.log( ele.id() );
-                    if (ele.group() == 'nodes' ) {
-                        modAgCom(Number(ele.id()));
-                    } else if (ele.group() == 'edges'){
-                        //modLink(Number(ele.id()));
-                    }
                     
+                    var id = String(ele.id());
+                    console.log(id);
+                    console.log(id.slice(1));
+                    modLink(Number(id.slice(1)));
                 }
             },
 
@@ -66,17 +64,56 @@ window.addEventListener('DOMContentLoaded', function(){
                 select: function(ele){
                     console.log( ele.data('name') );
                 },
-                enabled: false
+                //enabled: false
             },
 
             {
                 content: 'Feature',
                 select: function(ele){
                     console.log(ele)
-                    if (ele.group() == 'nodes' ) {
-                        console.log(data.node[ele.id()]);
-                    } else if (ele.group() == 'edges'){
-                        console.log(data.link[ele.id()]);
+                    
+                    console.log(data.link[ele.id()]);
+                   
+                    //console.log( ele.position() );
+                }
+            },
+
+        ]
+    });
+
+    cy.cxtmenu({
+        selector: 'node',
+
+        commands: [
+            {
+                content: 'modify',
+                select: function(ele){
+                    console.log( ele );
+                   
+                    modAgCom(Number(ele.id()));
+                    
+                    
+                }
+            },
+
+            {
+                content: 'delete',
+                select: function(ele){
+                    console.log( ele.data('name') );
+                    delAgCom(Number(ele.id()))
+                },
+                //enabled: false
+            },
+
+            {
+                content: 'Feature',
+                select: function(ele){
+                    console.log(ele)
+                    
+                    console.log(data.node[ele.id()]);
+                    var assets = data.node[ele.id()].asset;
+                    for (asset of assets){
+                        console.log(data.asset[asset]);
                     }
                     //console.log( ele.position() );
                 }
@@ -84,20 +121,13 @@ window.addEventListener('DOMContentLoaded', function(){
             {
                 content: 'Asset',
                 select: function(ele){
-                    if (ele.group() == 'nodes' ) {
-                        enabled: true
-                        var assets = data.node[ele.id()].asset;
-                        for (asset of assets){
-                            console.log(data.asset[asset]);
-                        }    
-                    } else if (ele.group() == 'edges'){
-                        enabled: false
-                    }
-                    //console.log( ele.position() );
-                }
-            }
+                    modAsset(Number(ele.id()));
+                }            
+            },
 
         ]
+
+
     });
 
     cy.cxtmenu({
@@ -236,3 +266,33 @@ let options = {
 
 
 });
+
+function updateGraph() {
+    resetGraph();
+    var nodes = [];
+    var links = [];
+    //console.log(data)
+    for (node of data.node){
+        nodes.push({ data: { id: Number(node.id), name: node.name } });
+    }
+    for (link of data.link){
+        links.push({data: { id: 'l'+link.id, source: link.source, target: link.destination }});
+    }
+    // console.log(nodes)
+    // console.log(links)
+    cy.add(nodes);
+    cy.add(links);
+    cy.center()
+    
+    var layout = cy.elements().layout({
+        name: 'cose'
+        });
+    layout.run();
+
+
+}
+
+function resetGraph() {
+    var collection = cy.elements('node');
+    cy.remove( collection );
+}

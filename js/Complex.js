@@ -135,16 +135,15 @@ function clicAddComm(nb_agent) {
         var admin = new Node(id_admin,choices.typeNode[1], name_admin, id_partners, [], [], [],community_objective, id_community_merber);
         
         nodes.push({ data: { id: id_admin, name: name_admin } });
-        data.nodeAdministratorName.push(name_admin);
+    
         data.node.push(admin);
 
         
         for(var i = 0; i < nb_agent; i++ ) {
-            var name = names[i];
-            var agent_temp = new Node(data.node.length,choices.typeNode[0],name,[],[id_admin],[],[]);
-            nodes.push({ data: { id: data.node.length, name: name } });
+            var Name = names[i];
+            var agent_temp = new Node(data.node.length,choices.typeNode[0],Name,[],[id_admin],[],[]);
+            nodes.push({ data: { id: Number(data.node.length), name: Name } });
             data.node.push(agent_temp);
-            data.nodeAgentName.push(name);
         }
      
         
@@ -182,32 +181,247 @@ function clicAddComm(nb_agent) {
             name: 'cose'
           });
         layout.run();
+
+        // actualise the page
+        addCom(nb_agent)
     } 
 } 
 
 function addExample() {
+    var content = document.getElementById("content");
+    content.innerHTML ="";
+
+    // choice of the example
+    var div = document.createElement("div");
+    div.textContent = "Example : ";
+    var selctElm1 = document.createElement("select");
+    var opt = document.createElement("option");
+    opt.setAttribute("value", '');
+    opt.innerText = 'Select...';
+    selctElm1.appendChild(opt);
+    for (choice of choices.examples){
+        var opt = document.createElement("option");
+        opt.setAttribute("value", choice);
+        opt.innerText = choice;
+        selctElm1.appendChild(opt);
+    }
+    div.appendChild(selctElm1);
+    content.appendChild(div);
+
+    selctElm1.onchange = function() {
+        this.options[0].disabled = true;
+        // button to save the choice
+        var div = document.createElement("div");
+        div.id = "button_add_link";
+        var buttonelm = document.createElement("input");
+
+        buttonelm.type = "button";
+        buttonelm.value = "Add link";
+        buttonelm.onclick = clicAddExample;
+        div.appendChild(buttonelm);
+        content.appendChild(div);
+
+    }
+
 
 }
-function addFile() {
 
+function clicAddExample() {
+    var content = document.getElementById("content");
+    var selects = content.getElementsByTagName("select");
+    var value1 = selects[0].options[selects[0].selectedIndex].value
+    switch(value1) {
+        case choices.examples[0]:
+            concatData(JSON.parse(JSON.stringify(examplesCommunity))); // to have a clone of the object
+            updateGraph();
+        break
+        case choices.examples[1]:
+            concatData(JSON.parse(JSON.stringify(examplesPToP))); // to have a clone of the object
+            updateGraph();
+        break
+
+    }
+    addExample();
+}
+
+
+function addFile(input) {
+    var reader=new FileReader();
+    reader.onload=function() {
+        data_added=JSON.parse(reader.result);
+        console.log("download");
+        //console.log(data_added);
+        concatData(data_added)
+        
+        
+        updateGraph();
+	};
+    reader.readAsText(input.files[0]);
 }
 
 function save() {
-
+    save();
 }
 function saveAs() {
+}
+
+function concatData(data_added) {
+    console.log(data_added)
+    // we need to add a off for all the id
+    var len_node = data.node.length;
+    var len_link = data.link.length;
+    var len_asset = data.asset.length;
+    
+    // The nodes
+    for (element of data_added.node){
+        element.id = element.id + len_node;
+        var len_admins = element.administrator.length;
+        var len_part = element.partners.length;
+        var len_assets = element.asset.length;
+        var len_assets_active = element.asset.length;
+        if (element.type == choices.typeNode[1]) {
+            var len_community = element.communityMember.length;
+        }
+
+        for (var indice = 0; indice < len_part; indice++){
+            element.partners[indice] = element.partners[indice] + len_node; 
+        }
+        for (var indice = 0; indice < len_admins; indice++){
+            element.administrator[indice] = element.administrator[indice] + len_node; 
+        }
+        for (var indice = 0; indice < len_assets; indice++){
+            element.asset[indice] = element.asset[indice] + len_asset; 
+        }
+        for (var indice = 0; indice < len_assets_active; indice++){
+            element.asset[indice] = element.asset[indice] + len_asset; 
+        }
+        if (element.type == choices.typeNode[1]) {
+            for (var indice = 0; indice < len_community; indice++){
+                element.communityMember[indice] = element.communityMember[indice] + len_node; 
+            }
+        }
+        
+        if (checkname(element.name)){
+            element.name = element.type +' '+ String(element.id);
+        }
+        data.node.push(element);
+    }
+    // The Links
+    for (element of data_added.link){
+        element.id = element.id + len_link;
+        element.source = element.source + len_node; 
+        element.destination = element.destination + len_node; 
+        element.name = 'Link ' + String(element.id);
+        
+        data.link.push(element);
+    }
+
+    // The Asset
+    
+    for (element of data_added.asset){
+        element.id = element.id + len_asset;
+        data.asset.push(element);
+    }
+
+    // the id unused
+    for (id of data_added.idNodeUnused) {
+        data.idNodeUnused.push(id + len_node)
+    }
+    for (id of data_added.idLinkUnused) {
+        data.idLinkUnused.push(id + len_link)
+    }
+    for (id of data_added.idAssetUnused) {
+        data.idAssetUnused.push(id + len_asset)
+    }
 
 }
 
-function opNew() {
 
+
+function opNew() {
+    data = {
+        nodeAgentName: [],
+        nodeAdministratorName: [],
+        link: [],
+        asset: [],
+        node: [],
+        idLinkUnused: [],
+        idAssetUnused: [],
+        idNodeUnused: [],
+        old_onglet: "asset_1",
+        oldNbAsset: 1
+    }
+    resetGraph();
 }
 
 function opExample() {
+    var content = document.getElementById("content");
+    content.innerHTML ="";
+
+    // choice of the example
+    var div = document.createElement("div");
+    div.textContent = "Example : ";
+    var selctElm1 = document.createElement("select");
+    var opt = document.createElement("option");
+    opt.setAttribute("value", '');
+    opt.innerText = 'Select...';
+    selctElm1.appendChild(opt);
+    for (choice of choices.examples){
+        var opt = document.createElement("option");
+        opt.setAttribute("value", choice);
+        opt.innerText = choice;
+        selctElm1.appendChild(opt);
+    }
+    div.appendChild(selctElm1);
+    content.appendChild(div);
+
+    selctElm1.onchange = function() {
+        this.options[0].disabled = true;
+        // button to save the choice
+        var div = document.createElement("div");
+        div.id = "button_add_link";
+        var buttonelm = document.createElement("input");
+
+        buttonelm.type = "button";
+        buttonelm.value = "Add link";
+        buttonelm.onclick = clicOpExample;
+        div.appendChild(buttonelm);
+        content.appendChild(div);
+
+    }
 
 }
 
-function opFile() {
-
+function clicOpExample() {
+    var content = document.getElementById("content");
+    var selects = content.getElementsByTagName("select");
+    var value1 = selects[0].options[selects[0].selectedIndex].value
+    switch(value1) {
+        case choices.examples[0]:
+            data = examplesCommunity;
+            updateGraph();
+        break
+        case choices.examples[1]:
+            data = examplesPToP;
+            updateGraph();
+        break
+    }
 }
 
+
+function opFile(input) {
+    console.log(input);
+    var reader=new FileReader();
+    reader.onload=function() {
+        data=JSON.parse(reader.result);
+        console.log("download");
+        updateGraph();
+	};
+    reader.readAsText(input.files[0]);
+}
+
+
+function save() {
+    var save = JSON.stringify(data);
+    document.location="data:text/csv;base64,"+btoa(save);
+}

@@ -10,3 +10,11 @@
 - jsnetworkx:
 	Network management.
 	url: http://jsnetworkx.org
+
+- onglet (exemple) :
+	http://www.supportduweb.com/scripts_tutoriaux-code-source-48-systeme-d-039-onglets-en-javascript-x-html-et-css-dans-la-meme-page.html
+
+- icones :
+ 	https://www.iconfinder.com/
+	https://thenounproject.com/
+

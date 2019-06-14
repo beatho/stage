@@ -62,9 +62,9 @@ function addLink() {
                 div2.id = "div2";
 
 
-                // choice of the new community members
+                // choice of the new partners
                 var div = document.createElement("div");
-                div.textContent = "New community members : ";
+                div.textContent = "New partners : ";
                 var selctElm3 = document.createElement("select");
                 selctElm3.id = 'members';
                 selctElm3.multiple = "multiple";
@@ -99,11 +99,18 @@ function addLink() {
                 div2.appendChild(div);
 
                 selctElm3.onchange = function(choice2) {
-                    if (this.options[0].selected){
+                    /*if (this.options[0].selected){
                         for (opt of this.options){
                             opt.selected = true;
                         }
+                    } this is not compatible with the navigator edge...*/
+                    
+                    if (this.options[0].selected){
+                        for (opt of Object.keys(this.options)){
+                            this.options[Number(opt)].selected = true;
+                        }
                     }
+
                     
                     var input1 = document.getElementById("preferenceSource");
                     var input2 = document.getElementById("preferenceDestination");
@@ -181,8 +188,8 @@ function addLink() {
             var selctElm2 = document.createElement("select");
             
             var opt = document.createElement("option");
-            opt.setAttribute("value", 'All');
-            opt.innerText = 'All';
+            opt.setAttribute("value", '');
+            opt.innerText = 'Select...';
             selctElm2.appendChild(opt);
             for (admin of data.node) {
                 if (admin != undefined){
@@ -224,7 +231,7 @@ function addLink() {
                 var source = data.node[choice.target.value];
                 var opt = document.createElement("option");
                 opt.setAttribute("value", '');
-                opt.innerText = 'Select...';
+                opt.innerText = 'All';
                 selctElm3.appendChild(opt);
                 for (agent of data.node) {
                     if (agent != undefined) {
@@ -314,6 +321,35 @@ function addLink() {
                 
             }
             
+        } else if (choice.target.value === choices.typeLink[2]){
+            
+            wrap.textContent = "This action is irreversible, this will delete all community manager and create partnership links between all agents";
+            // button to save the choice
+            var div = document.createElement("div");
+            div.id = "button_add_link";
+            var buttonelm = document.createElement("input");
+
+            buttonelm.type = "button";
+            buttonelm.value = "Add link";
+            buttonelm.onclick = clicAddLink;
+            div.appendChild(buttonelm);
+
+            wrap.appendChild(div);
+            content.appendChild(wrap);
+        } else if (choice.target.value === choices.typeLink[3]){
+            wrap.textContent = "This action is irreversible, this will delete all community manager and create partnership links agents of different types";
+            // button to save the choice
+            var div = document.createElement("div");
+            div.id = "button_add_link";
+            var buttonelm = document.createElement("input");
+
+            buttonelm.type = "button";
+            buttonelm.value = "Add link";
+            buttonelm.onclick = clicAddLink;
+            div.appendChild(buttonelm);
+
+            wrap.appendChild(div);
+            content.appendChild(wrap);
         }
     }
 }
@@ -326,66 +362,142 @@ function clicAddLink() {
     var links = [];
 
     var type_link = selects[0].options[selects[0].selectedIndex].value;
-    
-    
-    var source = Number(selects[1].options[selects[1].selectedIndex].value);
-    var members = [];
-    for (var i=1; i < selects[2].options.length; i++) 
-    {
-        if (selects[2].options[i].selected) 
-        {
-            members.push(Number(selects[2].options[i].value));
+    console.log(type_link)
+    if (type_link == choices.typeLink[2]){ 
+        
+        // delete all the community managers
+        for (admin of data.node){
+            if (admin != undefined && admin.type == choices.typeNode[1]){
+                hDelAgent(admin.id)
+
+            }
         }
-    }
-    var weightSrc = Number(inputs[1].value);
-    var chain_weightDest =inputs[2].value;
-    var weightDest =[];
-    var weightDest_temp ='';
-    k = 0;
-    for (chiffre of chain_weightDest) {
-        if (k < members.length) {
-            if (chiffre !== ';') {
-                weightDest_temp = weightDest_temp + chiffre;
-            } else {
-                number = Number(weightDest_temp);
-                if (number != number) {
-                    console.log("Warning it was not the good syntax, preference set at 0");
-                    number = 0;
+         // add all link need
+        var len = data.node.length;
+        for(var indice1 = 0; indice1 < len-1; indice1++){
+            var source = data.node[indice1];
+            if (source != undefined) {
+                for (var indice2 = indice1+1; indice2<len; indice2++){
+                    var destination = data.node[indice2];
+                    if (destination != undefined && !source.partners.includes(destination.id)){
+                        if ( data.idLinkUnused.length >0 ) {
+                            var id_link = data.idLinkUnused.shift();                
+                        } else {
+                            var id_link = data.link.length;
+                        }
+                        name = 'Link ' + String(id_link);
+                        var link_temp = new Link(id_link,choices.typeLink[0],source.id,destination.id,name,0,0);
+                        links.push({data: { id: 'l'+id_link, source: source.id, target: destination.id, group: choices.typeLink[0]}});
+                        data.node[indice1].partners.push(destination.id);
+                        data.node[indice2].partners.push(source.id);
+                        data.link[id_link] = link_temp;
+                    }
                 }
-                weightDest.push(number);
-                weightDest_temp = '';
-                k = k+1;
+            }
+            
+        }
+       
+    } else if (type_link == choices.typeLink[3]){
+         // delete all the community managers
+         for (admin of data.node){
+            if (admin != undefined && admin.type == choices.typeNode[1]){
+                hDelAgent(admin.id)
+
+            }
+        }
+        // add all link need
+        var len = data.node.length;
+        for(var indice1 = 0; indice1 < len-1; indice1++){
+            var source = data.node[indice1];
+            if (source != undefined) {
+                var type_source = source.typeAgent;
+                for (var indice2 = indice1+1; indice2<len; indice2++){
+                    var destination = data.node[indice2];
+                    if (destination != undefined && !source.partners.includes(destination.id)){
+                        var type_destination = destination.typeAgent;
+                        if (type_source == choices.typeAgent[2] || type_destination == choices.typeAgent[2] || type_source != type_destination ){
+                            if ( data.idLinkUnused.length >0 ) {
+                                var id_link = data.idLinkUnused.shift();                
+                            } else {
+                                var id_link = data.link.length;
+                            }
+                            name = 'Link ' + String(id_link);
+                            var link_temp = new Link(id_link,choices.typeLink[0],source.id,destination.id,name,0,0);
+                            links.push({data: { id: 'l'+id_link, source: source.id, target: destination.id, group:choices.typeLink[0]}});
+                            data.node[indice1].partners.push(destination.id);
+                            data.node[indice2].partners.push(source.id);
+                            data.link[id_link] = link_temp;
+                            }
+                        
+                    }
+                }
+            }
+            
+        }
+
+
+    }
+    
+    else {
+        var source = Number(selects[1].options[selects[1].selectedIndex].value);
+        var members = [];
+        for (var i=1; i < selects[2].options.length; i++) 
+        {
+            if (selects[2].options[i].selected) 
+            {
+                members.push(Number(selects[2].options[i].value));
+            }
+        }
+        var weightSrc = Number(inputs[1].value);
+        var chain_weightDest =inputs[2].value;
+        var weightDest =[];
+        var weightDest_temp ='';
+        k = 0;
+        for (chiffre of chain_weightDest) {
+            if (k < members.length) {
+                if (chiffre !== ';') {
+                    weightDest_temp = weightDest_temp + chiffre;
+                } else {
+                    number = Number(weightDest_temp);
+                    if (number != number) {
+                        console.log("Warning it was not the good syntax, preference set at 0");
+                        number = 0;
+                    }
+                    weightDest.push(number);
+                    weightDest_temp = '';
+                    k = k+1;
+                }
+            }
+        }
+        if (k < members.length){
+            number = Number(weightDest_temp);
+            if (number != number) {
+                console.log("Warning it was not the good syntax preference set at 0");
+                number = 0;
+            }
+            weightDest.push(number);
+        }
+        
+        for (member of members) {
+            if ( data.idLinkUnused.length >0 ) {
+                var id_link = data.idLinkUnused.shift();                
+            } else {
+                var id_link = data.link.length;
+            }
+            name = 'Link' + String(id_link);
+            var link_temp = new Link(id_link,type_link,source,member,name,weightSrc,weightDest.shift());
+            data.link.push(link_temp);
+            links.push({data: { id: 'l'+id_link, source: source, target: member, group: type_link }});
+            if (type_link == choices.typeLink[1]){
+                data.node[source].communityMember.push(member);
+                data.node[member].administrator.push(source);
+            } else if (type_link == choices.typeLink[0]){ 
+                data.node[source].partners.push(member);
+                data.node[member].partners.push(source);
             }
         }
     }
-    if (k < members.length){
-        number = Number(weightDest_temp);
-        if (number != number) {
-            console.log("Warning it was not the good syntax preference set at 0");
-            number = 0;
-        }
-        weightDest.push(number);
-    }
-    
-    for (member of members) {
-        if ( data.idLinkUnused.length >0 ) {
-            var id_link = data.idLinkUnused.shift();                
-        } else {
-            var id_link = data.link.length;
-        }
-        name = 'Link' + String(id_link);
-        var link_temp = new Link(id_link,type_link,source,member,name,weightSrc,weightDest.shift());
-        data.link.push(link_temp);
-        links.push({data: { id: 'l'+id_link, source: source, target: member }});
-        if (type_link == choices.typeLink[1]){
-            data.node[source].communityMember.push(member);
-            data.node[member].administrator.push(source);
-        } else if (type_link == choices.typeLink[0]){ 
-            data.node[source].partners.push(member);
-            data.node[member].partners.push(source);
-        }
-    }
-    
+   
     // update the graph
 
     cy.add(links);

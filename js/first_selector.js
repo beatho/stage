@@ -1,8 +1,6 @@
 // utiliser array.includes(truc) plutôt que array.indexOf(truc) == -1
 // rajouter if truc != undefined lors des parcours des options
 
-
-
 window.addEventListener("load",function()
 {   
     var wrap = document.getElementById("first_selection");
@@ -37,7 +35,7 @@ window.addEventListener("load",function()
         } else if (select2 !==null) {
             wrap.removeChild(select2);
         }
-        var select = document.getElementsByTagName("select")[1];
+        var select = document.getElementById("second_selector");
         if (select != null){
             wrap.removeChild(select);
         }
@@ -55,7 +53,7 @@ window.addEventListener("load",function()
             {
                 var selector2 = document.createElement("select");
                 selector2.onchange = changeSelect2;
-                var buttonelm = document.createElement("input");
+                selector2.id = "second_selector"
                 var opt = document.createElement("option");
                 opt.setAttribute("value", '');
                 opt.innerText = 'Select...';
@@ -228,9 +226,6 @@ function clicSelectChoice() {
                 switch(value2) {
                     case options[3].data[0]:
                         save();
-                    break
-                    case options[3].data[1]:
-                        saveAs();
                     break
                 }
         break

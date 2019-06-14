@@ -2,6 +2,9 @@
 function addAgent() {
     var content = document.getElementById("content");
     content.innerHTML ="";
+    data.oldNbAsset = 0;
+    data.old_onglet = "asset_1";
+
     // choice of the type of the node
     var div = document.createElement("div");
     div.textContent = "Agent type : ";
@@ -32,7 +35,12 @@ function addAgent() {
     selctElm1.onchange = function(choice) {
         var content = document.getElementById("content");
         var textElm = document.getElementById("node_name");
-        textElm.value = choice.target.value +' ' + String(data.node.length);
+        if ( data.idNodeUnused.length >0 ) {
+            var id_node = data.idNodeUnused[0];                
+        } else {
+            var id_node = data.node.length;
+        }
+        textElm.value = choice.target.value +' ' + String(id_node);
         this.options[0].disabled = true;
 
         
@@ -41,14 +49,14 @@ function addAgent() {
             
             // remove forms that we don't need
             var input = document.getElementById("Number_asset");
-            var tab = document.getElementById("onglets")
-            var tab2 = document.getElementById("contenu_onglets")
+            var tab = document.getElementById("tabs")
             if(input != null){
                 content.removeChild(input)
             }
             if(tab != null) {
                 content.removeChild(tab);
-                content.removeChild(tab2);
+                data.oldNbAsset = 0;
+                data.old_onglet = "asset_1";  
             }
             // choice of the Community objective:
             var div = document.createElement("div");
@@ -82,98 +90,14 @@ function addAgent() {
             var buttonelm = document.getElementById("button_add_node");
             content.insertBefore(div,buttonelm);
 
-            // creation of the default tab
-            var div2 = document.createElement("div");
-            div2.className = "onglets";
-            div2.id = "onglets";
-            var span = document.createElement("span");
-            span.className = "onglet_1 onglet";
-            span.id = "onglet_asset_" + String(1);
-            span.onclick = change_onglet("asset_" + String(1));
-            span.textContent = "Asset n°" + String(1);
-            div2.appendChild(span);
-            content.insertBefore(div2,buttonelm);
-            
-            // creation of the content of the default tab
-            var div3 = document.createElement("div");
-            div3.className = "contenu_onglets";
-            div3.id = "contenu_onglets";
-            var div4 = document.createElement("div");
-            div4.className = "contenu_onglet";
-            div4.id = 'contenu_onglet_asset_' + String(1);
-            div4.style = "display: block";
-            
-            //choice of the type of the Asset
             var div = document.createElement("div");
-            div.textContent = "Asset type : ";
-            var selctElm3 = document.createElement("select");
-            for (choice of choices.typeAsset){
-                var opt = document.createElement("option");
-                opt.setAttribute("value", choice);
-                opt.innerText = choice;
-                selctElm3.appendChild(opt);
-            }
-            div.appendChild(selctElm3);
-            div4.appendChild(div);
-        
-            // choice of the name of the Asset
-            var div = document.createElement("div");
-            div.textContent = "Asset name : ";
-            var textElm = document.createElement("input");
-            textElm.id = "asset_name";
-            textElm.type = "text";
-            textElm.value = 'Asset ' + String(data.asset.length);
-            div.appendChild(textElm);
-            div4.appendChild(div);
-
-            // type of the cost function 
-            var div = document.createElement("div");
-            div.textContent = "cost function type : ";
-            var selctElm4 = document.createElement("select");
-            for (choice of choices.functionType){
-                var opt = document.createElement("option");
-                opt.setAttribute("value", choice);
-                opt.innerText = choice;
-                selctElm4.appendChild(opt);
-            }
-            div.appendChild(selctElm4);
-            div4.appendChild(div);
-            
-            // features of the cost function
-            var div = document.createElement("div");
-            div.textContent = "Feature of the cost fonction (see help) ";
-            div.id = "Feature";
-            var numberElm1 = document.createElement("input");
-            numberElm1.type = "texte";
-            numberElm1.value = "1.0 ; 1.0 ; 1.0";
-            div.appendChild(numberElm1);
-            div4.appendChild(div);
-
-            // Power maximal and minimal
-            var div = document.createElement("div");
-            div.textContent = "Upper bound (kW) : ";
-            div.id = "Power_max";
-            var numberElm2 = document.createElement("input");
-            numberElm2.type = "number";
-            numberElm2.step = "any";
-            numberElm2.value = 0;
-            div.appendChild(numberElm2);
-            div4.appendChild(div);
-
-            var div = document.createElement("div");
-            div.textContent = "Lower bound (kW) :";
-            div.id = "Number_asset";
-            var numberElm3 = document.createElement("input");
-            numberElm3.type = "number";
-            numberElm3.step = "any";
-            numberElm3.value = 0;
-            div.appendChild(numberElm3);
-            div4.appendChild(div);
-
-            div3.appendChild(div4)
-            content.insertBefore(div3,buttonelm);
-            
-            data.oldNbAsset = 1;
+            div.className = "tabs";
+            div.id = "tabs";
+            div.nb = 1;
+            buttonelm = document.getElementById("button_add_node")
+            content.insertBefore(div,buttonelm);
+            window.tabs.apply();  
+            data.oldNbAsset = 1;  
 
             numberElm.onchange = function(choice) {
                 console.log(data.oldNbAsset)
@@ -191,92 +115,13 @@ function addAgent() {
                         }
                     }
                 } else if (nb_asset > data.oldNbAsset) {
-                    var div2 = document.getElementById("onglets"); 
-                    for (var indice = Number(data.oldNbAsset) ; indice < Number(nb_asset); indice++) {
-                                    
-                        var span = document.createElement("span");
-                        span.className = "onglet_0 onglet";
-                        span.id = "onglet_asset_" + String(indice+1);
-                        span.onclick = change_onglet("asset_" + String(indice+1));
-                        span.textContent = "Asset n°" + String(indice+1);
-                        div2.appendChild(span);
-                        //<span class="onglet_0 onglet" id="onglet_quoi" onclick="javascript:change_onglet('quoi');">Quoi</span>
-                    }
-                    var div3 = document.getElementById("contenu_onglets");
-                    for (var indice = Number(data.oldNbAsset); indice < Number(nb_asset); indice++) {
-                        var div4 = document.createElement("div");
-                        div4.className = "contenu_onglet";
-                        div4.id = 'contenu_onglet_asset_' + String(indice+1);
-                        
-                        //choice of the type of the Asset
-                        var div = document.createElement("div");
-                        div.textContent = "Asset type : ";
-                        var selctElm3 = document.createElement("select");
-                        for (choice of choices.typeAsset){
-                            var opt = document.createElement("option");
-                            opt.setAttribute("value", choice);
-                            opt.innerText = choice;
-                            selctElm3.appendChild(opt);
-                        }
-                        div.appendChild(selctElm3);
-                        div4.appendChild(div);
+                    var div = document.getElementById("tabs");
+                    div.className = "tabs";
+                    div.nb = nb_asset;
+                    content.insertBefore(div,buttonelm);
                     
-                        // choice of the name of the Asset
-                        var div = document.createElement("div");
-                        div.textContent = "Asset name : ";
-                        var textElm = document.createElement("input");
-                        textElm.id = "asset_name";
-                        textElm.type = "text";
-                        textElm.value = 'Asset ' + String(data.asset.length + indice);
-                        div.appendChild(textElm);
-                        div4.appendChild(div);
-
-                        // type of the cost function 
-                        var div = document.createElement("div");
-                        div.textContent = "cost function type : ";
-                        var selctElm4 = document.createElement("select");
-                        for (choice of choices.functionType){
-                            var opt = document.createElement("option");
-                            opt.setAttribute("value", choice);
-                            opt.innerText = choice;
-                            selctElm4.appendChild(opt);
-                        }
-                        div.appendChild(selctElm4);
-                        div4.appendChild(div);
-                        
-                        // features of the cost function
-                        var div = document.createElement("div");
-                        div.textContent = "Features of the cost fonction (see help) ";
-                        div.id = "Features";
-                        var numberElm1 = document.createElement("input");
-                        numberElm1.type = "texte";
-                        numberElm1.value = "1.0 ; 1.0 ; 1.0";
-                        div.appendChild(numberElm1);
-                        div4.appendChild(div);
-
-                        // Power maximal and minimal
-                        var div = document.createElement("div");
-                        div.textContent = "Upper bound (kW) : ";
-                        div.id = "Power_max";
-                        var numberElm2 = document.createElement("input");
-                        numberElm2.type = "number";
-                        numberElm2.step = "any";
-                        numberElm2.value = 0;
-                        div.appendChild(numberElm2);
-                        div4.appendChild(div);
-
-                        var div = document.createElement("div");
-                        div.textContent = "Lower bound (kW) :";
-                        div.id = "Number_asset";
-                        var numberElm3 = document.createElement("input");
-                        numberElm3.type = "number";
-                        numberElm3.step = "any";
-                        numberElm3.value = 0;
-                        div.appendChild(numberElm3);
-                        div4.appendChild(div);
-
-                        div3.appendChild(div4);
-                    }
+                    window.tabs.apply();
+                    
                 }
                 data.oldNbAsset = nb_asset;        
             }
@@ -295,10 +140,13 @@ function addAgent() {
     opt.innerText = 'None';
     selctElm2.appendChild(opt);
     for (node of data.node) {
-        var opt = document.createElement("option");
-        opt.setAttribute("value", node.id);
-        opt.innerText = node.name;
-        selctElm2.appendChild(opt);
+        if (node != undefined){
+            var opt = document.createElement("option");
+            opt.setAttribute("value", node.id);
+            opt.innerText = node.name;
+            selctElm2.appendChild(opt);
+        }
+        
     }
     div.appendChild(selctElm2);
     content.appendChild(div);
@@ -331,7 +179,7 @@ function addAgent() {
         }  
 
         for(admin of data.node) {
-            if((admin.type === choices.typeNode[1]) && (trading.indexOf(admin.id))== -1)
+            if((admin != undefined) && (admin.type === choices.typeNode[1]) && (trading.indexOf(admin.id))== -1)
             {
                 var opt = document.createElement("option");
                 opt.setAttribute("value", admin.id);
@@ -413,7 +261,7 @@ function clicAddNode() {
             community.push(selects[2].options[j].value);
         }
     }   
-    console.log(community);
+    //console.log(community);
     if (community[0] == 'undefined'){
         community = [];
     } else 
@@ -425,10 +273,10 @@ function clicAddNode() {
 
     
     var name = inputs[0].value;
-    if ( data.idLinkUnused.length >0 ) {
+    if ( data.idNodeUnused.length >0 ) {
         var id_node = data.idNodeUnused.shift();                
     } else {
-         var id_node = data.node.length;
+        var id_node = data.node.length;
     }
     if (type_node == choices.typeNode[1]){
         var objective = selects[3].options[selects[3].selectedIndex].value;
@@ -441,7 +289,7 @@ function clicAddNode() {
     
     
     
-    console.log(data.node);
+    //console.log(data.node);
        
     
     // create the links 
@@ -452,7 +300,7 @@ function clicAddNode() {
          var id_link = data.link.length;
     }
         var link_temp = new Link(id_link,choices.typeLink[0],id_node,id,0,0,'');
-        links.push({data: { id: 'l'+id_link, source: id_node, target: id } });
+        links.push({data: { id: 'l'+id_link, source: id_node, target: id, group: choices.typeLink[0] } });
         data.link.push(link_temp);
         
     }
@@ -465,72 +313,103 @@ function clicAddNode() {
         // the source is always the community manager
         if(type_node == choices.typeNode[0]) {
             var link_temp = new Link(id_link,choices.typeLink[0],id,id_node,0,0,'');
-            links.push({data: { id: 'l'+id_link, source: id, target: id_node }});
+            links.push({data: { id: 'l'+id_link, source: id, target: id_node, group: choices.typeLink[1] }});
         } else if (type_node == choices.typeNode[1]) {
             var link_temp = new Link(id_link,choices.typeLink[0],id_node,id,0,0,'');
-            links.push({data: { id: 'l'+id_link, source: id_node, target: id }});
+            links.push({data: { id: 'l'+id_link, source: id_node, target: id, group: choices.typeLink[1] }});
         }
         
         
         data.link.push(link_temp);
     }
-
+    var group_node = type_node;
 
     // Create the assets
-    var nb_asset = inputs[3].value;
-    for (var indice=0; indice<nb_asset; indice++){
-        if ( data.idAssetUnused.length >0 ) {
-            var id_asset = data.idAssetUnused.shift();                
-        } else {
-         var id_asset = data.asset.length;
-        }
-        agent_temp.asset.push(id_asset);
+    var typeAgent ='';
+    if (type_node == choices.typeNode[0]){
+        var nb_asset = inputs[3].value;
+        var offset_select = choices.nbFormAsset[0];
+        var offset_input = choices.nbFormAsset[1];
+        for (var indice=0; indice<nb_asset; indice++){
+            if ( data.idAssetUnused.length >0 ) {
+                var id_asset = data.idAssetUnused.shift();                
+            } else {
+            var id_asset = data.asset.length;
+            }
+            agent_temp.asset.push(id_asset);
 
-        var asset_type = selects[3+2*indice].options[selects[3+2*indice].selectedIndex].value;
-        var function_type = selects[4+2*indice].options[selects[4+2*indice].selectedIndex].value;
+            var asset_type = selects[3+offset_select*indice].options[selects[3+offset_select*indice].selectedIndex].value;
+            var function_type = selects[4+offset_select*indice].options[selects[4+offset_select*indice].selectedIndex].value;
 
-        var asset_name = inputs[4 + 4* indice].value;
-        var Pmax = Number(inputs[6 + 4* indice].value);
-        var Pmin = Number(inputs[7 + 4* indice].value);
-        
-        var chain_features =inputs[5+4*indice].value;
-        var feat =[];
-        var feat_temps ='';
-        k = 0;
-        for (chiffre of chain_features) {
-            if (k < choices.nbFeature[function_type]) {
-                if (chiffre !== ';') {
-                    feat_temps = feat_temps + chiffre;
-                } else {
-                    number = Number(feat_temps);
-                    if (number != number) {
-                        console.log("Warning it was not the good syntax")
-                        asset_name = asset_name + 'syntax error'
+            var asset_name = inputs[4 + offset_input* indice].value; // beware there are input invisible because of the add of multiple select
+            var Pmax = Number(inputs[6 + offset_input* indice].value);
+            var Pmin = Number(inputs[7 + offset_input* indice].value);
+
+            if (Pmin > Pmax) {
+                console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify by modify asset or agent");
+                var P_temp = Pmax;
+                Pmax = Pmin;
+                Pmin = P_temp;
+            }
+
+            if (typeAgent != choices.typeAgent[2]){
+                if ((typeAgent == choices.typeAgent[0] && Pmax >0) || (typeAgent == choices.typeAgent[1] && Pmin < 0)) {
+                    typeAgent = choices.typeAgent[2];
+                } else if (typeAgent == '') {
+                    if (Pmax<=0){
+                        typeAgent = choices.typeAgent[0];
+                    } else if (Pmin>= 0) {
+                        typeAgent = choices.typeAgent[1];
+                    } else {
+                        typeAgent = choices.typeAgent[2];
                     }
-                    feat.push(number);
-                    feat_temps = '';
-                    k = k+1;
                 }
             }
-        }
-        if (k < choices.nbFeature[function_type]){
-            number = Number(feat_temps);
-            if (number != number) {
-                console.log("Warning it was not the good syntax");
-                number =0;
+            
+            var chain_features =inputs[5+offset_input*indice].value;
+            var feat =[];
+            var feat_temps ='';
+            k = 0;
+            for (chiffre of chain_features) {
+                if (k < choices.nbFeature[function_type]) {
+                    if (chiffre !== ';') {
+                        feat_temps = feat_temps + chiffre;
+                    } else {
+                        number = Number(feat_temps);
+                        if (number != number) {
+                            console.log("Warning it was not the good syntax")
+                            asset_name = asset_name + 'syntax error'
+                        }
+                        feat.push(number);
+                        feat_temps = '';
+                        k = k+1;
+                    }
+                }
             }
-            feat.push(number);
-        }
-        
-        
+            if (k < choices.nbFeature[function_type]){
+                number = Number(feat_temps);
+                if (number != number) {
+                    console.log("Warning it was not the good syntax");
+                    number =0;
+                }
+                feat.push(number);
+            }
+            
+            
 
-        var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
-        data.asset[id_asset] = asset_temp;
+            var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
+            data.asset[id_asset] = asset_temp;
+        }
+        agent_temp.typeAgent = typeAgent;
+        group_node = typeAgent;
     }
+    
     data.node[id_node] = agent_temp;
 
     // update the graph
-    cy.add({ data: { id: id_node, name: name } })
+    //console.log(group_node)
+    cy.add({ data: { id: id_node, name: name, group: group_node} })
+    console.log(links);
     if (links.length >0) {
         cy.add(links);
     }
@@ -543,37 +422,6 @@ function clicAddNode() {
     
     // update the page 
     addAgent();
-}
-
-function checkname(choice) {
-    //var text = document.getElementById("node_name");
-    if (choice.target == undefined){
-        var node_name = choice;
-    } else {
-        var node_name = choice.target.value;
-    }
-    for (node of data.node ) {
-        if (node_name === node.name){
-            console.log("Beware name already used");
-            return true;
-        }
-    }
-    return false
-}
-
-
-function change_onglet(name) {
-    return function() {
-        document.getElementById('onglet_'+name).className = 'onglet_1 onglet';
-        document.getElementById('contenu_onglet_'+name).style.display = 'block';
-        var old = data.old_onglet;
-        data.old_onglet = name;
-        // si élément supprimé affiche erreur mais fonctionne !
-        document.getElementById('onglet_' + old).className = 'onglet_0 onglet';
-        document.getElementById('contenu_onglet_'+ old).style.display = 'none';
-        
-    }
-            
 }
 
 function modAgCom(nodeId) {
@@ -612,67 +460,6 @@ function modAgCom(nodeId) {
     div.appendChild(textElm);
     content.appendChild(div);
 
-    selctElm1.onchange = function(choice) {
-        var content = document.getElementById("content");
-        var textElm = document.getElementById("node_name");
-        textElm.value = choice.target.value +' ' + String(oldNode.id);
-           
-
-        if (choice.target.value == choices.typeNode[1]) {
-            // change the legend if the form exists
-            var commuElmt = document.getElementById("Community_membership")
-            if (commuElmt != null){
-                commuElmt.textContent = "Community membership"
-            }
-                        
-            // remove forms that we don't need
-            var input = document.getElementById("Number_asset");
-            
-            if(input != null){
-                content.removeChild(input)
-            }
-           
-            // choice of the Community objective:
-            var div = document.createElement("div");
-            div.textContent = "Community objective : ";
-            div.id = "community_objective"
-            var selctElm1 = document.createElement("select");
-            for (choice of choices.comObjective){
-                var opt = document.createElement("option");
-                opt.setAttribute("value", choice);
-                opt.innerText = choice;
-                selctElm1.appendChild(opt);
-                if(choice == oldNode.objective){
-                    opt.selected = "selected";
-                }
-            }
-            div.appendChild(selctElm1);
-            var buttonelm = document.getElementById("button_add_node");
-            content.insertBefore(div,buttonelm);
-
-        } else if (choice.target.value == choices.typeNode[0]){
-            var commuElmt = document.getElementById("Community_membership")
-            if (commuElmt != null){
-                commuElmt.textContent = "Community members"
-            }
-
-            var input = document.getElementById("community_objective");
-                if(input != null) {
-                    content.removeChild(input);
-                }
-            var div = document.createElement("div");
-            div.textContent = "Number of assets : ";
-            div.id = "Number_asset";
-            var numberElm = document.createElement("input");
-            numberElm.type = "number";
-            numberElm.step = 1;
-            numberElm.min = 1;
-            numberElm.value = oldNode.asset.lenght;
-            div.appendChild(numberElm);
-            var buttonelm = document.getElementById("button_add_node");
-            content.insertBefore(div,buttonelm);
-        }
-    }
     // choice of trading partners 
     var div = document.createElement("div");
     div.textContent = "Trading partners : ";
@@ -684,17 +471,15 @@ function modAgCom(nodeId) {
     opt.innerText = 'None';
     selctElm2.appendChild(opt);
     for (node of data.node) {
-        if (node != undefined){
-            console.log(nodeId);
-            if(node.id != nodeId){
-                var opt = document.createElement("option");
-                opt.setAttribute("value", node.id);
-                opt.innerText = node.name;
-                selctElm2.appendChild(opt);
-                if (oldNode.partners.indexOf(node.id) != -1) {
-                    opt.selected = "selected";
-                }
+        if (node != undefined && node.id != nodeId ){
+            var opt = document.createElement("option");
+            opt.setAttribute("value", node.id);
+            opt.innerText = node.name;
+            selctElm2.appendChild(opt);
+            if (oldNode.partners.includes(node.id)) {
+                opt.selected = "selected";
             }
+            
         }
         
     }
@@ -717,12 +502,12 @@ function modAgCom(nodeId) {
     opt.innerText = 'None';
     selctElm3.appendChild(opt);
     for(admin of data.node) {
-        if(admin.type == choices.typeNode[1]){
+        if(admin.type == choices.typeNode[1] && !oldNode.partners.includes(node.id) && admin.id != oldNode.id ){
             var opt = document.createElement("option");
             opt.setAttribute("value", admin.id);
             opt.innerText = admin.name;
             selctElm3.appendChild(opt); 
-            if(oldNode.administrator.indexOf(admin.id) != -1) {
+            if(oldNode.administrator.includes(admin.id)) {
                 opt.selected = "selected";
             }
         }
@@ -734,7 +519,7 @@ function modAgCom(nodeId) {
         select: '#community'
     })
 
-    if(oldNode == choices.typeNode[1]){
+    if(oldNode.type == choices.typeNode[1]){
         var div = document.createElement("div");
         div.textContent = "Community objective : ";
         div.id = "community_objective"
@@ -755,36 +540,151 @@ function modAgCom(nodeId) {
         var div = document.createElement("div");
         div.textContent = "Community members : ";
         div.id = "Community_members";
-        var selctElm3 = document.createElement("select");
-        selctElm3.multiple = "multiple";
-        selctElm3.size = 2;
-        selctElm3.id = "community2"
+        var selctElm5 = document.createElement("select");
+        selctElm5.multiple = "multiple";
+        selctElm5.size = 2;
+        selctElm5.id = "members"
         var opt = document.createElement("option");
         opt.setAttribute("value", undefined);
         opt.innerText = 'None';
-        selctElm3.appendChild(opt);
+        selctElm5.appendChild(opt);
         for(node of data.node) {
-        
+            if (!oldNode.partners.includes(node.id) && oldNode.administrator.includes(node.id)  && node.id != oldNode.id  )
             var opt = document.createElement("option");
-            opt.setAttribute("value", admin.id);
-            opt.innerText = admin.name;
-            selctElm3.appendChild(opt); 
-            if(oldNode.administrator.indexOf(admin.id) != -1) {
+            opt.setAttribute("value", node.id);
+            opt.innerText = node.name;
+            selctElm5.appendChild(opt); 
+            if(oldNode.communityMember.includes(node.id)) {
                 opt.selected = "selected";
-            }
-            
-            
+            } 
         } 
-        div.appendChild(selctElm3);
+        div.appendChild(selctElm5);
         content.appendChild(div);
         new SlimSelect({
-            select: '#community2'
+            select: '#members'
         })
+    } else if (oldNode.type == choices.typeNode[0]){
+        
+        var div = document.createElement("div");
+        div.id = "tabs"
+        div.className = "tabs";
+        div.nb = oldNode.asset.length;
+        div.agent = oldNode;
+        content.appendChild(div);
+        
+        window.tabs.apply();
+
+    }
+
+    // save of new data
+    var div = document.createElement("div");
+    div.id = "button_add_node";
+    var buttonelm = document.createElement("input");
+
+    buttonelm.type = "button";
+    buttonelm.value = "Add node";
+    buttonelm.onclick = clicModNode(nodeId);
+    div.appendChild(buttonelm);
+    content.appendChild(div);   
+ 
+    selctElm1.onchange = function(choice) {
+        var content = document.getElementById("content");
+        var textElm = document.getElementById("node_name");
+        textElm.value = choice.target.value + ' ' + String(oldNode.id);
+        var buttonelm = document.getElementById("button_add_node");
+
+        if (choice.target.value == choices.typeNode[1]) {
+            
+            // remove forms that we don't need
+            var tab = document.getElementById("tabs");
+            
+            if(tab != null){
+                content.removeChild(tab)
+            }
+           
+            // choice of the Community objective:
+            var div = document.createElement("div");
+            div.textContent = "Community objective : ";
+            div.id = "community_objective"
+            var selctElm1 = document.createElement("select");
+            for (choice of choices.comObjective){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", choice);
+                opt.innerText = choice;
+                selctElm1.appendChild(opt);
+                if(choice == oldNode.objective){
+                    opt.selected = "selected";
+                }
+            }
+            div.appendChild(selctElm1);
+            
+            content.insertBefore(div,buttonelm);
+
+            var div = document.createElement("div");
+            div.textContent = "Community members : ";
+            div.id = "Community_members";
+            var selctElm4 = document.createElement("select");
+            selctElm4.multiple = "multiple";
+            selctElm4.size = 2;
+            selctElm4.id = "members"
+            var opt = document.createElement("option");
+            opt.setAttribute("value", undefined);
+            opt.innerText = 'None';
+            selctElm4.appendChild(opt);
+            for(node of data.node) {
+                if(!oldNode.partners.includes(node.id) && !oldNode.administrator.includes(node.id)  && node.id != oldNode.id ){
+                    var opt = document.createElement("option");
+                    opt.setAttribute("value", node.id);
+                    opt.innerText = node.name;
+                    selctElm4.appendChild(opt); 
+                    if(oldNode.communityMember != undefined && oldNode.communityMember.includes(node.id)) {
+                        opt.selected = "selected";
+                    }
+                }  
+            } 
+            div.appendChild(selctElm4);
+            content.insertBefore(div,buttonelm);
+            new SlimSelect({
+                select: '#members'
+            })
+
+
+        } else if (choice.target.value == choices.typeNode[0]){
+            
+
+            var input = document.getElementById("community_objective");
+            var input2 = document.getElementById("Community_members")
+                if(input != null) {
+                    content.removeChild(input);
+                    content.removeChild(input2);
+                }
+
+            var div = document.createElement("div");
+            div.id = "tabs"
+            div.className = "tabs";
+            div.nb = oldNode.asset.length;
+            content.insertBefore(div,buttonelm);
+            
+            window.tabs.apply();
+
+            
+            
+        }
     }
 
     selctElm2.onchange = function(choice) {
         // choice of community membership
         var div = document.getElementById("Community_membership")
+
+        var partners = [];
+        for (var i=0; i < this.options.length; i++) 
+        {
+            if (this.options[i].selected) 
+            {
+                partners.push(this.options[i].value);
+            }
+        }
+        
         var div2 = document.createElement("div");
         div2.textContent = "Community membership : ";
         var selctElm3 = document.createElement("select");
@@ -795,12 +695,12 @@ function modAgCom(nodeId) {
         opt.innerText = 'None';
         selctElm3.appendChild(opt);
         for(admin of data.node) {
-            if((admin.type === choices.typeNode[1]) && (admin.id != choice.target.value)){
+            if((admin.type === choices.typeNode[1]) && !(partners.includes(admin.id))  && admin.id != oldNode.id ){
                 var opt = document.createElement("option");
                 opt.setAttribute("value", admin.id);
                 opt.innerText = admin.name;
                 selctElm3.appendChild(opt); 
-                if(oldNode.administrator.indexOf(admin.id) != -1) {
+                if(oldNode.administrator.includes(admin.id)) {
                     opt.selected = "selected";
                 }
             }
@@ -814,17 +714,71 @@ function modAgCom(nodeId) {
         })
         
     }
-    // save of new data
-    var div = document.createElement("div");
-    div.id = "button_add_node";
-    var buttonelm = document.createElement("input");
 
-    buttonelm.type = "button";
-    buttonelm.value = "Add node";
-    buttonelm.onclick = clicModNode(nodeId);
-    div.appendChild(buttonelm);
-    content.appendChild(div);   
- 
+    selctElm3.onchange = function(choice) {
+        if(oldNode == choices.typeNode[1]){
+            var select = document.getElementById("trading")
+            var trading_partners = [];
+            for (var i=0; i < select.options.length; i++) 
+            {
+                if (select.options[i].selected) 
+                {
+                    trading_partners.push(select.options[i].value);
+                }
+            } 
+            if (trading_partners[0] == 'undefined'){
+                var trading_partners = [];
+            }
+            else 
+            {
+                for (var i=0; i< trading_partners.length; i++) {
+                    trading_partners[i] = Number(trading_partners[i])
+                }
+            }
+            
+            
+            var admins = [];
+            for (var i=0; i < this.options.length; i++) 
+            {
+                if (this.options[i].selected) 
+                {
+                    admins.push(this.options[i].value);
+                }
+            }
+            if (admins[0] == 'undefined'){
+                var admins = [];
+            }
+
+            var div = document.getElementById("Community_members");
+
+            var div2 = document.createElement("div");
+            div2.textContent = "Community members : ";
+            var selctElm5 = document.createElement("select");
+            selctElm5.multiple = "multiple";
+            selctElm5.size = 2;
+            selctElm5.id = "members"
+            var opt = document.createElement("option");
+            opt.setAttribute("value", undefined);
+            opt.innerText = 'None';
+            selctElm5.appendChild(opt);
+            for(node of data.node) {
+                if (!trading_partners.includes(node.id) && admins.includes(node.id)  && node.id != oldNode.id )
+                var opt = document.createElement("option");
+                opt.setAttribute("value", node.id);
+                opt.innerText = node.name;
+                selctElm5.appendChild(opt); 
+                if(oldNode.communityMember.includes(node.id)) {
+                    opt.selected = "selected";
+                } 
+            } 
+            div2.appendChild(selctElm5);
+            content.replaceChild(div2,div)
+            div2.id = "Community_members";
+            new SlimSelect({
+                select: '#members'
+            })
+        }
+    }
 }
 
 function clicModNode(nodeId) {
@@ -836,7 +790,8 @@ function clicModNode(nodeId) {
 
         var name = text.value;
         var id_agent = Number(nodeId);
-
+        var oldNode = data.node[id_agent];
+        var asset = oldNode.asset; // the id of asset can't change
 
         // remove the old element
 
@@ -882,17 +837,35 @@ function clicModNode(nodeId) {
                 administrators[i] = Number(administrators[i])
             }
         }
-        
-
-
-        var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,[],[] );
+        if (type_node == choices.typeNode[1]){
+            var objective = selects[3].options[selects[3].selectedIndex].value;
+            
+            var members = [];
+            for (var i=0; i < selects[4].options.length; i++) 
+            {
+                if (selects[4].options[i].selected) 
+                {
+                    members.push(selects[4].options[i].value);
+                }
+            }  
+            if (members[0] == 'undefined'){
+                var members = [];
+            }
+            else 
+            {
+                for (var i=0; i< members.length; i++) {
+                    members[i] = Number(members[i])
+                }
+            }
+            
+            var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,[],[],objective, members);
+        } else if (type_node == options.typeNode[0]){
+            var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,asset,[] );
+        }
+            
         data.node[id_agent] = agent_temp;
         //console.log(data.node);
-        if (type_node === choices.typeNode[0]) {
-            data.nodeAgentName.push(name);
-        } else if ( type_node === choices.typeNode[1] ) {
-            data.nodeAdministratorName.push(name);
-        }
+        
         
 
         // create the new links 
@@ -906,7 +879,7 @@ function clicModNode(nodeId) {
             var name_link = 'Link ' + String(id_link);
             var link_temp = new Link(id_link,choices.typeLink[0],id_agent,id,name_link,0,0);
             data.link[id_link] = link_temp;
-            links.push({data: { id: 'l'+ id_link, source: id_agent, target: id }});
+            links.push({data: { id: 'l'+ id_link, source: id_agent, target: id, group:choices.typeLink[0] }});
         }
         for (id of administrators) {
             if ( data.idLinkUnused.length >0 ) {
@@ -915,12 +888,101 @@ function clicModNode(nodeId) {
                 var id_link = data.link.length;
             }
             var name_link = 'Link ' + String(id_link);
-            var link_temp = new Link(id_link,choices.typeLink[1],id_agent,id,name_link,0,0);
+            var link_temp = new Link(id_link,choices.typeLink[1],id,id_agent,name_link,0,0);
             data.link[id_link] = link_temp;
-            links.push({data: { id: 'l'+id_link, source: id_agent, target: id  }});
+            links.push({data: { id: 'l'+id_link, source: id, target: id_agent,group:choices.typeLink[1]  }});
         }
+        if (type_node == choices.typeNode[1]){
+            for (id of members) {
+                if ( data.idLinkUnused.length >0 ) {
+                    id_link = data.idLinkUnused.shift();                
+                } else {
+                    var id_link = data.link.length;
+                }
+                var name_link = 'Link ' + String(id_link);
+                var link_temp = new Link(id_link,choices.typeLink[1],id_agent,id,name_link,0,0);
+                data.link[id_link] = link_temp;
+                links.push({data: { id: 'l'+id_link, source: id_agent, target: id ,group:choices.typeLink[0]  }});
+            }
+
+        }
+        var node_group = type_node;
+        //update the assets
+        var agentType = '';
+        if (type_node == choices.typeNode[0]){
+            var nb_asset = agent.asset.length;
+            var offset_select = choices.nbFormAsset[0];
+            var offset_input = choices.nbFormAsset[1];
+            for (var indice=0; indice<nb_asset; indice++){
+                var id_asset = agent.asset[indice];
+                
+                var asset_type = selects[3+offset_select*indice].options[selects[3+offset_select*indice].selectedIndex].value;
+                var function_type = selects[4+offset_select*indice].options[selects[4+offset_select*indice].selectedIndex].value;
+
+                var asset_name = inputs[3 + offset_input*indice].value;
+                var Pmax = Number(inputs[5 + offset_input* indice].value);
+                var Pmin = Number(inputs[6 + offset_input* indice].value);
+
+                if (Pmin > Pmax) {
+                    console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify by modify asset or agent");
+                    var P_temp = Pmax;
+                    Pmax = Pmin;
+                    Pmin = P_temp;
+                }
+    
+                if (agentType != choices.agentType[2]){
+                    if ((agentType == choices.agentType[0] && Pmax >0) || (agentType == choices.agentType[1] && Pmin < 0)) {
+                        agentType = choices.agentType[2];
+                    } else if (agentType == '') {
+                        if (Pmax<=0){
+                            agentType = choices.agentType[0];
+                        } else if (Pmin>= 0) {
+                            agentType = choices.agentType[1];
+                        } else {
+                            agentType = choices.agentType[2];
+                        }
+                    }
+                }
+                
+                var chain_features =inputs[4 + offset_input*indice].value;
+                var feat =[];
+                var feat_temps ='';
+                k = 0;
+                for (chiffre of chain_features) {
+                    if (k < choices.nbFeature[function_type]) {
+                        if (chiffre !== ';') {
+                            feat_temps = feat_temps + chiffre;
+                        } else {
+                            number = Number(feat_temps);
+                            if (number != number) {
+                                console.log("Warning it was not the good syntax, feature set to 0")
+                                asset_name = asset_name + 'syntax error'
+                                numer = 0;
+                            }
+                            feat.push(number);
+                            feat_temps = '';
+                            k = k+1;
+                        }
+                    }
+                }
+                if (k < choices.nbFeature[function_type]){
+                    number = Number(feat_temps);
+                    if (number != number) {
+                    console.log("Warning it was not the good syntax")
+                    }
+                    feat.push(number);
+                }
+                var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
+                data.asset[id_asset] = asset_temp;
+            }
+            data.Node[nodeId].typeAgent = typeAgent;
+            node_group = typeAgent;
+        }
+
+
+
         // update the graphe
-        cy.add({ data: { id: id_agent, name: name } })
+        cy.add({ data: { id: id_agent, name: name, group:node_group } })
         cy.add(links);
         cy.center()
         
@@ -938,6 +1000,8 @@ function clicModNode(nodeId) {
 function addAsset(){
     var content = document.getElementById("content");
     content.innerHTML ="";
+    data.oldNbAsset = 0;
+    data.old_onglet = "asset_1";
 
     // choice of the node
     var div = document.createElement("div");
@@ -958,8 +1022,9 @@ function addAsset(){
     div.appendChild(selctElm1);
     content.appendChild(div);
 
+    // choice of the number of asset 
     var div = document.createElement("div");
-    div.textContent = "Number of added assets : ";
+    div.textContent = "Number of assets : ";
     div.id = "Number_asset";
     var numberElm = document.createElement("input");
     numberElm.type = "number";
@@ -967,102 +1032,22 @@ function addAsset(){
     numberElm.min = 1;
     numberElm.value = 1;
     div.appendChild(numberElm);
+    
     content.appendChild(div);
 
-    // creation of the default tab
-    var div2 = document.createElement("div");
-    div2.className = "onglets";
-    div2.id = "onglets";
-    var span = document.createElement("span");
-    span.className = "onglet_1 onglet";
-    span.id = "onglet_asset_" + String(1);
-    span.onclick = change_onglet("asset_" + String(1));
-    span.textContent = "Asset n°" + String(1);
-    div2.appendChild(span);
-    content.appendChild(div2);
+    var div = document.createElement("div");
+    div.className = "tabs";
+    div.id = "tabs";
+    div.nb = 1;
     
-    // creation of the content of the default tab
-    var div3 = document.createElement("div");
-    div3.className = "contenu_onglets";
-    div3.id = "contenu_onglets";
-    var div4 = document.createElement("div");
-    div4.className = "contenu_onglet";
-    div4.id = 'contenu_onglet_asset_' + String(1);
-    div4.style = "display: block";
-    
-    //choice of the type of the Asset
-    var div = document.createElement("div");
-    div.textContent = "Asset type : ";
-    var selctElm3 = document.createElement("select");
-    for (choice of choices.typeAsset){
-        var opt = document.createElement("option");
-        opt.setAttribute("value", choice);
-        opt.innerText = choice;
-        selctElm3.appendChild(opt);
-    }
-    div.appendChild(selctElm3);
-    div4.appendChild(div);
-
-    // choice of the name of the Asset
-    var div = document.createElement("div");
-    div.textContent = "Asset name : ";
-    var textElm = document.createElement("input");
-    textElm.id = "asset_name";
-    textElm.type = "text";
-    textElm.value = 'Asset ' + String(data.asset.length);
-    div.appendChild(textElm);
-    div4.appendChild(div);
-
-    // type of the cost function 
-    var div = document.createElement("div");
-    div.textContent = "cost function type : ";
-    var selctElm4 = document.createElement("select");
-    for (choice of choices.functionType){
-        var opt = document.createElement("option");
-        opt.setAttribute("value", choice);
-        opt.innerText = choice;
-        selctElm4.appendChild(opt);
-    }
-    div.appendChild(selctElm4);
-    div4.appendChild(div);
-    
-    // features of the cost function
-    var div = document.createElement("div");
-    div.textContent = "Feature of the cost fonction (see help) ";
-    div.id = "Feature";
-    var numberElm1 = document.createElement("input");
-    numberElm1.type = "texte";
-    numberElm1.value = "1.0 ; 1.0 ; 1.0";
-    div.appendChild(numberElm1);
-    div4.appendChild(div);
-
-    // Power maximal and minimal
-    var div = document.createElement("div");
-    div.textContent = "Upper bound (kW) : ";
-    div.id = "Power_max";
-    var numberElm2 = document.createElement("input");
-    numberElm2.type = "number";
-    numberElm2.step = "any";
-    numberElm2.value = 0;
-    div.appendChild(numberElm2);
-    div4.appendChild(div);
-
-    var div = document.createElement("div");
-    div.textContent = "Lower bound (kW) :";
-    div.id = "Number_asset";
-    var numberElm3 = document.createElement("input");
-    numberElm3.type = "number";
-    numberElm3.step = "any";
-    numberElm3.value = 0;
-    div.appendChild(numberElm3);
-    div4.appendChild(div);
-
-    div3.appendChild(div4)
-    content.appendChild(div3);
-        
-    data.oldNbAsset = 1;
+    content.appendChild(div);
+    window.tabs.apply();  
+    data.oldNbAsset = 1;  
 
     numberElm.onchange = function(choice) {
+        var buttonelm = document.getElementById("button_add_asset");
+        console.log(data.oldNbAsset)
+        
         var nb_asset = choice.target.value;
         var wrap_tab = document.getElementById("onglets");
         var wrap_tabcontent = document.getElementById("contenu_onglets")
@@ -1076,102 +1061,21 @@ function addAsset(){
                 }
             }
         } else if (nb_asset > data.oldNbAsset) {
-            var div2 = document.getElementById("onglets"); 
-            for (var indice = Number(data.oldNbAsset) ; indice < Number(nb_asset); indice++) {
-                            
-                var span = document.createElement("span");
-                span.className = "onglet_0 onglet";
-                span.id = "onglet_asset_" + String(indice+1);
-                span.onclick = change_onglet("asset_" + String(indice+1));
-                span.textContent = "Asset n°" + String(indice+1);
-                div2.appendChild(span);
-                //<span class="onglet_0 onglet" id="onglet_quoi" onclick="javascript:change_onglet('quoi');">Quoi</span>
-            }
-            var div3 = document.getElementById("contenu_onglets");
-            for (var indice = Number(data.oldNbAsset); indice < Number(nb_asset); indice++) {
-                var div4 = document.createElement("div");
-                div4.className = "contenu_onglet";
-                div4.id = 'contenu_onglet_asset_' + String(indice+1);
-                
-                //choice of the type of the Asset
-                var div = document.createElement("div");
-                div.textContent = "Asset type : ";
-                var selctElm3 = document.createElement("select");
-                for (choice of choices.typeAsset){
-                    var opt = document.createElement("option");
-                    opt.setAttribute("value", choice);
-                    opt.innerText = choice;
-                    selctElm3.appendChild(opt);
-                }
-                div.appendChild(selctElm3);
-                div4.appendChild(div);
+            var div = document.getElementById("tabs");
+            div.className = "tabs";
+            div.nb = nb_asset;
+            content.insertBefore(div,buttonelm);
             
-                // choice of the name of the Asset
-                var div = document.createElement("div");
-                div.textContent = "Asset name : ";
-                var textElm = document.createElement("input");
-                textElm.id = "asset_name";
-                textElm.type = "text";
-                textElm.value = 'Asset ' + String(data.asset.length + indice);
-                div.appendChild(textElm);
-                div4.appendChild(div);
-
-                // type of the cost function 
-                var div = document.createElement("div");
-                div.textContent = "cost function type : ";
-                var selctElm4 = document.createElement("select");
-                for (choice of choices.functionType){
-                    var opt = document.createElement("option");
-                    opt.setAttribute("value", choice);
-                    opt.innerText = choice;
-                    selctElm4.appendChild(opt);
-                }
-                div.appendChild(selctElm4);
-                div4.appendChild(div);
-                
-                // features of the cost function
-                var div = document.createElement("div");
-                div.textContent = "Features of the cost fonction (see help) ";
-                div.id = "Features";
-                var numberElm1 = document.createElement("input");
-                numberElm1.type = "texte";
-                numberElm1.value = "1.0 ; 1.0 ; 1.0";
-                div.appendChild(numberElm1);
-                div4.appendChild(div);
-
-                // Power maximal and minimal
-                var div = document.createElement("div");
-                div.textContent = "Upper bound (kW) : ";
-                div.id = "Power_max";
-                var numberElm2 = document.createElement("input");
-                numberElm2.type = "number";
-                numberElm2.step = "any";
-                numberElm2.value = 0;
-                div.appendChild(numberElm2);
-                div4.appendChild(div);
-
-                var div = document.createElement("div");
-                div.textContent = "Lower bound (kW) :";
-                div.id = "Number_asset";
-                var numberElm3 = document.createElement("input");
-                numberElm3.type = "number";
-                numberElm3.step = "any";
-                numberElm3.value = 0;
-                div.appendChild(numberElm3);
-                div4.appendChild(div);
-
-                div3.appendChild(div4);
-            }
+            window.tabs.apply();
+            
         }
         data.oldNbAsset = nb_asset;        
     }
-
-    selctElm1.onchange = function() {
-        this.options[0].disabled = true;
-    }
-      /*save of new data */
+    /*save of new data */
+    
+   
     var div = document.createElement("div");
-    div.id = "button_add_node";
+    div.id = "button_add_asset";
     var buttonelm = document.createElement("input");
 
     buttonelm.type = "button";
@@ -1179,6 +1083,8 @@ function addAsset(){
     buttonelm.onclick = clicAddAsset;
     div.appendChild(buttonelm);
     content.appendChild(div);   
+    
+    
     
 }
 
@@ -1191,6 +1097,9 @@ function clicAddAsset(){
     var id_agent = selects[0].options[selects[0].selectedIndex].value;
 
     var nb_asset = inputs[0].value;
+
+    
+    var typeAgent = data.node[id_agent].typeAgent;
     for (var indice=0; indice<nb_asset; indice++){
         if ( data.idAssetUnused.length >0 ) {
             var id_asset = data.idAssetUnused.shift();                
@@ -1205,6 +1114,26 @@ function clicAddAsset(){
         var asset_name = inputs[1 + 4*indice].value;
         var Pmax = Number(inputs[3 + 4* indice].value);
         var Pmin = Number(inputs[4 + 4* indice].value);
+        
+        if (Pmin > Pmax) {
+            console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify it by changing asset or agent");
+            var P_temp = Pmax;
+            Pmax = Pmin;
+            Pmin = P_temp;
+        }
+        if (typeAgent == '') {
+            if (Pmax<=0){
+                typeAgent = choices.typeAgent[0];
+            } else if (Pmin>= 0) {
+                typeAgent = choices.typeAgent[1];
+            } else {
+                typeAgent = choices.typeAgent[2];
+            }
+        }else if (typeAgent != choices.typeAgent[2]){
+            if ((typeAgent == choices.typeAgent[0] && Pmax >0) || (typeAgent == choices.typeAgent[1] && Pmin < 0)) {
+                typeAgent = choices.typeAgent[2];
+            } 
+        } 
         
         var chain_features =inputs[2 + 4*indice].value;
         var feat =[];
@@ -1235,142 +1164,44 @@ function clicAddAsset(){
             feat.push(number);
         }
         var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
-        data.asset.push(asset_temp);
-        
+        data.asset.push(asset_temp); 
     }
-    // update the page
+    data.node[id_agent].typeAgent = typeAgent;
 
+    // update the graphe
+    console.log(typeAgent)
+    var node = cy.getElementById(String(id_agent));
+
+    var links1 = cy.edges('[source = '+ '\"' + String(id_agent) +'\"' +']');
+    var links2 = cy.edges('[target = ' +'\"' + String(id_agent)+ '\"' +']');
+    console.log(links1);
+    console.log(links2)
+    cy.remove(node);
+    cy.add({ data: { id: id_agent, name: data.node[id_agent].name, group: typeAgent} })
+    links1.restore();
+    links2.restore();
+    var layout = cy.elements().layout({
+        name: 'cose'
+        });
+    layout.run();
+
+    // update the page
     addAsset();
 }
 
 function modAsset(nodeId){
     var content = document.getElementById("content");
     content.innerHTML ="";
-
-    var agent = data.node[nodeId];
+    var div = document.createElement("div");
+    div.className = "tabs";
+    div.agent = data.node[nodeId]
+    div.nb = data.node[nodeId].asset.length;
     
-    var init = true;
+    content.appendChild(div);
     
-    var div2 = document.createElement("div");
-    div2.className = "onglets";
-    div2.id = "onglets";
-    for(var indice=0; indice < agent.asset.length; indice++) {
-        var asset = data.asset[agent.asset[indice]];
-        // creation of the default tab
-        var span = document.createElement("span");
-        if (init){
-            span.className = "onglet_1 onglet";
-            data.old_onglet = "asset_1";
-            init = false;
-        } else {
-            span.className = "onglet_0 onglet";
-        }
-        
-        span.id = "onglet_asset_" + String(indice+1);
-        span.onclick = change_onglet("asset_" + String(indice+1));
-        span.textContent = "Asset n°" + String(indice+1);
-        div2.appendChild(span);
-    }
-    content.appendChild(div2);
-
-    var div3 = document.createElement("div");
-    div3.className = "contenu_onglets";
-    div3.id = "contenu_onglets";
-    init = true;
-
-    for(var indice=0; indice < agent.asset.length; indice++) {
-        var asset = data.asset[agent.asset[indice]];
-        // creation of the content of the default tab
-        
-        var div4 = document.createElement("div");
-        div4.className = "contenu_onglet";
-        div4.id = 'contenu_onglet_asset_' + String(indice+1);
-        if (init){
-            div4.style = "display: block";
-            init = false;
-        }         
-        
-        //choice of the type of the Asset
-        var div = document.createElement("div");
-        div.textContent = "Asset type : ";
-        var selctElm3 = document.createElement("select");
-        for (choice of choices.typeAsset){
-            var opt = document.createElement("option");
-            opt.setAttribute("value", choice);
-            opt.innerText = choice;
-            selctElm3.appendChild(opt);
-            if (asset.type == choice){
-                opt.selected = true;
-            }
-        }
-        div.appendChild(selctElm3);
-        div4.appendChild(div);
-
-        // choice of the name of the Asset
-        var div = document.createElement("div");
-        div.textContent = "Asset name : ";
-        var textElm = document.createElement("input");
-        textElm.id = "asset_name";
-        textElm.type = "text";
-        textElm.value = asset.name;
-        div.appendChild(textElm);
-        div4.appendChild(div);
-
-        // type of the cost function 
-        var div = document.createElement("div");
-        div.textContent = "cost function type : ";
-        var selctElm4 = document.createElement("select");
-        for (choice of choices.functionType){
-            var opt = document.createElement("option");
-            opt.setAttribute("value", choice);
-            opt.innerText = choice;
-            selctElm4.appendChild(opt);
-            if (asset.functionType == choice){
-                opt.selected = true;
-            }
-        }
-        div.appendChild(selctElm4);
-        div4.appendChild(div);
-        
-        // features of the cost function
-        var div = document.createElement("div");
-        div.textContent = "Feature of the cost fonction (see help) ";
-        div.id = "Feature";
-        var numberElm1 = document.createElement("input");
-        numberElm1.type = "texte";
-        var feature = asset.functionCharac;
-        var feat_chain = '';
-        for (feat of feature){
-            feat_chain = feat_chain + String(feat) + ' ; ';
-        }
-        numberElm1.value = feat_chain;
-        div.appendChild(numberElm1);
-        div4.appendChild(div);
-
-        // Power maximal and minimal
-        var div = document.createElement("div");
-        div.textContent = "Upper bound (kW) : ";
-        div.id = "Power_max";
-        var numberElm2 = document.createElement("input");
-        numberElm2.type = "number";
-        numberElm2.step = "any";
-        numberElm2.value = asset.Pmaxcap;
-        div.appendChild(numberElm2);
-        div4.appendChild(div);
-
-        var div = document.createElement("div");
-        div.textContent = "Lower bound (kW) : ";
-        div.id = "Number_asset";
-        var numberElm3 = document.createElement("input");
-        numberElm3.type = "number";
-        numberElm3.step = "any";
-        numberElm3.value = asset.Pmincap;
-        div.appendChild(numberElm3);
-        div4.appendChild(div);
-
-        div3.appendChild(div4)
-    }
-    content.appendChild(div3);
+    window.tabs.apply();
+                    
+    
             
     /*  save of new data */
     var div = document.createElement("div");
@@ -1667,7 +1498,7 @@ function clicDelNode(){
     var id_node = selects[0].options[selects[0].selectedIndex].value;
     var node = data.node[id_node];
     var choice = selects[1].options[selects[1].selectedIndex].value;
-
+    var typeAgent = '';
     if (node.type == choices.typeNode[0]) {
         
         if (choice ==choices.deleteAgent[0]){
@@ -1683,7 +1514,27 @@ function clicDelNode(){
                     delete data.asset[asset];
                     data.idAssetUnused.push(asset)
                 }
+                else {
+                    var asset = Number(selects[2].options[i].value);
+                    var Pmax = data.asset[asset].Pmaxcap;
+                    var Pmin = data.asset[asset].Pmincap;
+                    if (typeAgent != choices.typeAgent[2]){
+                        if ((typeAgent == choices.typeAgent[0] && Pmax >0) || (typeAgent == choices.typeAgent[1] && Pmin < 0)) {
+                            typeAgent = choices.typeAgent[2];
+                        } else if (typeAgent == '') {
+                            if (Pmax<=0){
+                                typeAgent = choices.typeAgent[0];
+                            } else if (Pmin>= 0) {
+                                typeAgent = choices.typeAgent[1];
+                            } else {
+                                typeAgent = choices.typeAgent[2];
+                            }
+                        }
+                    }
+                }             
             }
+            console.log()
+            data.node[id_node].typeAgent = typeAgent;
         }
 
     } 
@@ -1716,55 +1567,4 @@ function clicDelNode(){
     // update the page
     delAgCom();
 
-}
-
-function hDelLinks(id_node) {
-    for (link of data.link) {
-        if (link !=undefined) {
-            if (link.source == id_node || link.destination == id_node){
-                var id_link = link.id;
-                delete data.link[id_link];
-                data.idLinkUnused.push(id_link);
-                var edge = cy.getElementById('l'+id_link);
-                cy.remove(edge);
-            }
-        }
-        
-    }
-}
-function hDelAgent(id_node) {
-    
-    var agent = data.node[id_node];
-    if (agent != undefined) {
-        for (partner of agent.partners) {
-            if ( data.node[partner].partners.indexOf(id_node) != -1 ) {
-                data.node[partner].partners.splice(data.node[partner].partners.indexOf(id_node),1);
-            }
-        }
-        for (admin of agent.administrator){
-            if ( data.node[admin].communityMember.indexOf(id_node) != -1 ) {
-                data.node[admin].communityMember.splice(data.node[admin].communityMember.indexOf(id_node),1);
-            }
-        }
-        if(data.node[id_node].type == choices.typeNode[1]) {
-            for (member of agent.communityMember){
-                if (data.node[member].administrator.indexOf(id_node) != -1 ) {
-                    data.node[member].administrator.splice(data.node[member].administrator.indexOf(id_node),1);
-                }
-            }
-        }
-    
-        hDelLinks(id_node);
-    
-        for (asset of agent.asset ){
-            delete data.asset[asset];
-            data.idAssetUnused.push(asset)
-        }
-        delete data.node[id_node];
-        data.idNodeUnused.push(id_node);
-        var node = cy.getElementById(String(id_node));
-        cy.remove(node);
-    }
-
-    
 }

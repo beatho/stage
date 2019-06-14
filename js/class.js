@@ -1,5 +1,5 @@
 class Node {
-	constructor(_id,_type,_name, _partners, _administrator, _asset, _assetActive,_objective ='',_communityMember = []) {
+	constructor(_id,_type,_name, _partners, _administrator, _asset, _assetActive,_objective ='',_communityMember = [],_typeAgent='') {
 		this.id = _id;
 		this.type = _type;
 		this.name = _name;
@@ -33,6 +33,8 @@ class Node {
 					this.communityMember.push(member);
 				}  
 			} 
+		} else if (this.type == choices.typeNode[0]) {
+			this.typeAgent = _typeAgent;
 		}
 	}
 }

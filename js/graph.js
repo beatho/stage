@@ -1,3 +1,13 @@
+/*
+color for graph :
+manager : red
+productor : blue
+consumer : yellow
+prosumer : green
+partnership link : grey
+community link : black
+*/
+
 window.addEventListener('DOMContentLoaded', function(){
 
     var cy = window.cy = cytoscape({
@@ -8,19 +18,79 @@ window.addEventListener('DOMContentLoaded', function(){
 
         style: [
             {
-                selector: 'node',
+                selector: "node[group=\"Manager\"]",
                 css: {
-                    'content': 'data(name)'
+                    //'content': 'data(name)',
+                    'overlay-color':'blue',
+                    'width': 10,
+                    'height': 10,
+                    'background-color': 'red',
+                }
+            },
+            {
+                selector: "node[group=\"Agent\"]",
+                css: {
+                    //'content': 'data(name)',
+                    'overlay-color':'blue',
+                    'width': 10,
+                    'height': 10,
+                    
+                }
+            },
+            {
+                selector: "node[group=\"Productor\"]",
+                css: {
+                    //'content': 'data(name)',
+                    'overlay-color':'blue',
+                    'width': 10,
+                    'height': 10,
+                    'background-color': 'blue',
+                    
+                }
+            },
+            {
+                selector: "node[group=\"Consumer\"]",
+                css: {
+                    //'content': 'data(name)',
+                    'overlay-color':'blue',
+                    'width': 10,
+                    'height': 10,
+                    'background-color': 'yellow',
+                    
+                }
+            },
+            {
+                selector: "node[group=\"Prosumer\"]",
+                css: {
+                    //'content': 'data(name)',
+                    'overlay-color':'blue',
+                    'width': 10,
+                    'height': 10,
+                    'background-color': 'green',
+                    
+                }
+            },
+            {
+                selector: "edge[group=\"Community membership\"]",
+                css: {
+                    'curve-style': 'bezier',
+                    'target-arrow-shape': 'triangle',
+                    'width': 2,
+                    'opacity': 0.5,
+                    "line-color": 'black'
+                }
+            },
+            {
+                selector: "edge[group=\"Partnership\"]",
+                css: {
+                    'curve-style': 'bezier',
+                    'target-arrow-shape': 'triangle',
+                    'width': 2,
+                    'opacity': 0.5,
+                    "line-color": 'purple'
                 }
             },
 
-            {
-                selector: 'edge',
-                css: {
-                    'curve-style': 'bezier',
-                    'target-arrow-shape': 'triangle'
-                }
-            }
         ],
 
         
@@ -82,7 +152,7 @@ window.addEventListener('DOMContentLoaded', function(){
     });
 
     cy.cxtmenu({
-        selector: 'node',
+        selector: "node[group!=\"Manager\"]",
 
         commands: [
             {
@@ -129,6 +199,48 @@ window.addEventListener('DOMContentLoaded', function(){
 
 
     });
+    cy.cxtmenu({
+        selector: "node[group=\"Manager\"]",
+
+        commands: [
+            {
+                content: 'modify',
+                select: function(ele){
+                    console.log( ele );
+                   
+                    modAgCom(Number(ele.id()));
+                    
+                    
+                }
+            },
+
+            {
+                content: 'delete',
+                select: function(ele){
+                    console.log( ele.data('name') );
+                    delAgCom(Number(ele.id()))
+                },
+                //enabled: false
+            },
+
+            {
+                content: 'Feature',
+                select: function(ele){
+                    console.log(ele)
+                    
+                    console.log(data.node[ele.id()]);
+                    var assets = data.node[ele.id()].asset;
+                    for (asset of assets){
+                        console.log(data.asset[asset]);
+                    }
+                    //console.log( ele.position() );
+                }
+            },
+
+        ]
+
+
+    });
 
     cy.cxtmenu({
         selector: 'core',
@@ -149,7 +261,6 @@ window.addEventListener('DOMContentLoaded', function(){
             }
         ]
     });
-
 
 let options = {
     name: 'cose',
@@ -189,7 +300,7 @@ let options = {
     fit: true,
   
     // Padding on fit
-    padding: 30,
+    padding: 50,
   
     // Constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
     boundingBox: undefined,
@@ -219,7 +330,7 @@ let options = {
     nestingFactor: 1.2,
   
     // Gravity force (constant)
-    gravity: 1,
+    gravity: 10,
   
     // Maximum number of iterations to perform
     numIter: 1000,
@@ -261,7 +372,7 @@ let options = {
     };*/
   
     cy.layout( options );
-
+   
 
 
 
@@ -273,10 +384,19 @@ function updateGraph() {
     var links = [];
     //console.log(data)
     for (node of data.node){
-        nodes.push({ data: { id: Number(node.id), name: node.name } });
+        if (node != undefined){
+            var group_node = node.type;
+            if (group_node == choices.typeNode[0] && node.typeAgent !=''){
+                var group_node = node.typeAgent;
+            } 
+            nodes.push({ data: { id: Number(node.id), name: node.name, group: group_node } });
+        }
+        
     }
     for (link of data.link){
-        links.push({data: { id: 'l'+link.id, source: link.source, target: link.destination }});
+        if (link != undefined){
+            links.push({data: { id: 'l'+link.id, source: Number(link.source), target: Number(link.destination), group: link.type }});
+        }
     }
     // console.log(nodes)
     // console.log(links)

@@ -127,14 +127,14 @@ function clicAddComm(nb_agent) {
         names.push(name_temp);
         
        
-        var id_community_merber = [];
+        var id_community_member = [];
         for(var i = 0; i < nb_agent; i++ ) {
-            id_community_merber.push(data.node.length+1+i)
+            id_community_member.push(data.node.length+1+i)
         }
         id_admin = data.node.length;
-        var admin = new Node(id_admin,choices.typeNode[1], name_admin, id_partners, [], [], [],community_objective, id_community_merber);
+        var admin = new Node(id_admin,choices.typeNode[1], name_admin, id_partners, [], [], [],community_objective, id_community_member);
         
-        nodes.push({ data: { id: id_admin, name: name_admin } });
+        nodes.push({ data: { id: id_admin, name: name_admin, group: choices.typeNode[1] } });
     
         data.node.push(admin);
 
@@ -142,7 +142,7 @@ function clicAddComm(nb_agent) {
         for(var i = 0; i < nb_agent; i++ ) {
             var Name = names[i];
             var agent_temp = new Node(data.node.length,choices.typeNode[0],Name,[],[id_admin],[],[]);
-            nodes.push({ data: { id: Number(data.node.length), name: Name } });
+            nodes.push({ data: { id: Number(data.node.length), name: Name, group: choices.typeNode[0] } });
             data.node.push(agent_temp);
         }
      
@@ -156,13 +156,13 @@ function clicAddComm(nb_agent) {
             }
             var name = 'Link ' + String(data.link.length);
             var link_temp = new Link(id_link,choices.typeLink[0],id_admin,id,name,0,0);
-            links.push({data: { id: 'l'+id_link, source: id_admin, target: id }});
+            links.push({data: { id: 'l'+id_link, source: id_admin, target: id, group: choices.typeLink[0] }});
             data.link.push(link_temp);
             var agent_temp = data.node[id];
             agent_temp.partners.push(id_admin);
             data.node[id] = agent_temp; 
         }
-        for (id of id_community_merber) {
+        for (id of id_community_member) {
             if ( data.idLinkUnused.length >0 ) {
                 var id_link = data.idLinkUnused.shift();                
             } else {
@@ -171,7 +171,7 @@ function clicAddComm(nb_agent) {
             var name = 'Link ' + String(data.link.length);
             var link_temp = new Link(id_link,choices.typeLink[1],id_admin,id,name,0,0);
             data.link.push(link_temp);
-            links.push({data: { id: 'l'+id_link, source: id_admin, target: id }});
+            links.push({data: { id: 'l'+id_link, source: id_admin, target: id, group: choices.typeLink[1] }});
         }
         // update the graph
         cy.add(nodes)
@@ -211,39 +211,58 @@ function addExample() {
     selctElm1.onchange = function() {
         this.options[0].disabled = true;
         // button to save the choice
-        var div = document.createElement("div");
-        div.id = "button_add_link";
-        var buttonelm = document.createElement("input");
+        var button = document.getElementById("button_add_example")
+        console.log(button)
+        if (button == null){
+            var div = document.createElement("div");
+            div.id = "button_add_example";
+            var buttonelm = document.createElement("input");
 
-        buttonelm.type = "button";
-        buttonelm.value = "Add link";
-        buttonelm.onclick = clicAddExample;
-        div.appendChild(buttonelm);
-        content.appendChild(div);
-
+            buttonelm.type = "button";
+            buttonelm.value = "Add Example";
+            buttonelm.onclick = clicAddExample;
+            div.appendChild(buttonelm);
+            content.appendChild(div);
+        }
     }
-
-
 }
 
 function clicAddExample() {
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
     var value1 = selects[0].options[selects[0].selectedIndex].value
-    switch(value1) {
-        case choices.examples[0]:
-            concatData(JSON.parse(JSON.stringify(examplesCommunity))); // to have a clone of the object
-            updateGraph();
-        break
-        case choices.examples[1]:
-            concatData(JSON.parse(JSON.stringify(examplesPToP))); // to have a clone of the object
-            updateGraph();
-        break
-
-    }
-    addExample();
+    var xhr; 
+        try {  xhr = new ActiveXObject('Msxml2.XMLHTTP');   }
+        catch (e) 
+        {
+            try {   xhr = new ActiveXObject('Microsoft.XMLHTTP'); }
+            catch (e2) 
+            {
+               try {  xhr = new XMLHttpRequest();  }
+               catch (e3) {  xhr = false;   }
+             }
+        }
+        xhr.onreadystatechange  = function() 
+        { 
+           if(xhr.readyState  == 4)
+           {
+            if(xhr.status  == 200) {
+                data_added=JSON.parse(xhr.responseText);
+                concatData(data_added);
+                updateGraph();
+                addExample();
+            }else {
+                console.log(xhr.status)
+            }
+                
+            }
+            
+        }; 
+     
+       xhr.open("GET", value1 + '.json',  true); 
+       xhr.send(null); 
+    
 }
-
 
 function addFile(input) {
     var reader=new FileReader();
@@ -259,11 +278,6 @@ function addFile(input) {
     reader.readAsText(input.files[0]);
 }
 
-function save() {
-    save();
-}
-function saveAs() {
-}
 
 function concatData(data_added) {
     console.log(data_added)
@@ -274,53 +288,60 @@ function concatData(data_added) {
     
     // The nodes
     for (element of data_added.node){
-        element.id = element.id + len_node;
-        var len_admins = element.administrator.length;
-        var len_part = element.partners.length;
-        var len_assets = element.asset.length;
-        var len_assets_active = element.asset.length;
-        if (element.type == choices.typeNode[1]) {
-            var len_community = element.communityMember.length;
-        }
-
-        for (var indice = 0; indice < len_part; indice++){
-            element.partners[indice] = element.partners[indice] + len_node; 
-        }
-        for (var indice = 0; indice < len_admins; indice++){
-            element.administrator[indice] = element.administrator[indice] + len_node; 
-        }
-        for (var indice = 0; indice < len_assets; indice++){
-            element.asset[indice] = element.asset[indice] + len_asset; 
-        }
-        for (var indice = 0; indice < len_assets_active; indice++){
-            element.asset[indice] = element.asset[indice] + len_asset; 
-        }
-        if (element.type == choices.typeNode[1]) {
-            for (var indice = 0; indice < len_community; indice++){
-                element.communityMember[indice] = element.communityMember[indice] + len_node; 
+        if (element != undefined){
+            element.id = element.id + len_node;
+            var len_admins = element.administrator.length;
+            var len_part = element.partners.length;
+            var len_assets = element.asset.length;
+            var len_assets_active = element.asset.length;
+            if (element.type == choices.typeNode[1]) {
+                var len_community = element.communityMember.length;
             }
+
+            for (var indice = 0; indice < len_part; indice++){
+                element.partners[indice] = element.partners[indice] + len_node; 
+            }
+            for (var indice = 0; indice < len_admins; indice++){
+                element.administrator[indice] = element.administrator[indice] + len_node; 
+            }
+            for (var indice = 0; indice < len_assets; indice++){
+                element.asset[indice] = element.asset[indice] + len_asset; 
+            }
+            for (var indice = 0; indice < len_assets_active; indice++){
+                element.asset[indice] = element.asset[indice] + len_asset; 
+            }
+            if (element.type == choices.typeNode[1]) {
+                for (var indice = 0; indice < len_community; indice++){
+                    element.communityMember[indice] = element.communityMember[indice] + len_node; 
+                }
+            }
+            
+            if (checkname(element.name)){
+                element.name = element.type +' '+ String(element.id);
+            }
+            data.node.push(element);
         }
         
-        if (checkname(element.name)){
-            element.name = element.type +' '+ String(element.id);
-        }
-        data.node.push(element);
     }
     // The Links
     for (element of data_added.link){
-        element.id = element.id + len_link;
-        element.source = element.source + len_node; 
-        element.destination = element.destination + len_node; 
-        element.name = 'Link ' + String(element.id);
-        
-        data.link.push(element);
+        if (element != undefined){
+            element.id = element.id + len_link;
+            element.source = element.source + len_node; 
+            element.destination = element.destination + len_node; 
+            element.name = 'Link ' + String(element.id);
+            
+            data.link.push(element);
+        }
     }
 
     // The Asset
     
     for (element of data_added.asset){
-        element.id = element.id + len_asset;
-        data.asset.push(element);
+        if (element != undefined){
+            element.id = element.id + len_asset;
+            data.asset.push(element);
+        }
     }
 
     // the id unused
@@ -336,10 +357,18 @@ function concatData(data_added) {
 
 }
 
-
-
 function opNew() {
-    data = {
+    var content = document.getElementById("content");
+    content.innerHTML ="";
+
+    var div = document.createElement('div');
+    div.textContent = 'Are you sure ? It will delete everything.'
+
+    var button = document.createElement('input');
+    button.type = "button";
+    button.value = "confirm";
+    button.onclick = function() {
+        data = {
         nodeAgentName: [],
         nodeAdministratorName: [],
         link: [],
@@ -350,8 +379,9 @@ function opNew() {
         idNodeUnused: [],
         old_onglet: "asset_1",
         oldNbAsset: 1
+        }
+        resetGraph();
     }
-    resetGraph();
 }
 
 function opExample() {
@@ -378,15 +408,19 @@ function opExample() {
     selctElm1.onchange = function() {
         this.options[0].disabled = true;
         // button to save the choice
-        var div = document.createElement("div");
-        div.id = "button_add_link";
-        var buttonelm = document.createElement("input");
+        var button = document.getElementById("button_open_example");
+        if (button == null){
+            var div = document.createElement("div");
+            div.id = "button_open_example";
+            var buttonelm = document.createElement("input");
 
-        buttonelm.type = "button";
-        buttonelm.value = "Add link";
-        buttonelm.onclick = clicOpExample;
-        div.appendChild(buttonelm);
-        content.appendChild(div);
+            buttonelm.type = "button";
+            buttonelm.value = "Open Example";
+            buttonelm.onclick = clicOpExample;
+            div.appendChild(buttonelm);
+            content.appendChild(div);
+        }
+        
 
     }
 
@@ -396,16 +430,36 @@ function clicOpExample() {
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
     var value1 = selects[0].options[selects[0].selectedIndex].value
-    switch(value1) {
-        case choices.examples[0]:
-            data = examplesCommunity;
-            updateGraph();
-        break
-        case choices.examples[1]:
-            data = examplesPToP;
-            updateGraph();
-        break
+    var xhr; 
+    try {  xhr = new ActiveXObject('Msxml2.XMLHTTP');   }
+    catch (e) 
+    {
+        try {   xhr = new ActiveXObject('Microsoft.XMLHTTP'); }
+        catch (e2) 
+        {
+           try {  xhr = new XMLHttpRequest();  }
+           catch (e3) {  xhr = false;   }
+         }
     }
+    xhr.onreadystatechange  = function() 
+    { 
+       if(xhr.readyState  == 4)
+       {
+        if(xhr.status  == 200) {
+            data=JSON.parse(xhr.responseText);
+            updateGraph();
+            opExample();
+        }else {
+            console.log(xhr.status)
+        }
+            
+        }
+        
+    }; 
+ 
+   xhr.open("GET", value1 + '.json',  true); 
+   xhr.send(null); 
+
 }
 
 
@@ -422,6 +476,7 @@ function opFile(input) {
 
 
 function save() {
+    console.log("Saving...")
     var save = JSON.stringify(data);
     document.location="data:text/csv;base64,"+btoa(save);
 }

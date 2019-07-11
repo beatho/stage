@@ -1,7 +1,7 @@
 /*
 color for graph :
 manager : red
-productor : blue
+producer  : blue
 consumer : yellow
 prosumer : green
 partnership link : grey
@@ -32,18 +32,18 @@ window.addEventListener('DOMContentLoaded', function(){
                 css: {
                     //'content': 'data(name)',
                     'overlay-color':'blue',
-                    'width': 10,
-                    'height': 10,
+                    'width': 5,
+                    'height': 5,
                     
                 }
             },
             {
-                selector: "node[group=\"Productor\"]",
+                selector: "node[group=\"Producer \"]",
                 css: {
                     //'content': 'data(name)',
                     'overlay-color':'blue',
-                    'width': 10,
-                    'height': 10,
+                    'width': 5,
+                    'height': 5,
                     'background-color': 'blue',
                     
                 }
@@ -53,8 +53,8 @@ window.addEventListener('DOMContentLoaded', function(){
                 css: {
                     //'content': 'data(name)',
                     'overlay-color':'blue',
-                    'width': 10,
-                    'height': 10,
+                    'width': 5,
+                    'height': 5,
                     'background-color': 'yellow',
                     
                 }
@@ -64,8 +64,8 @@ window.addEventListener('DOMContentLoaded', function(){
                 css: {
                     //'content': 'data(name)',
                     'overlay-color':'blue',
-                    'width': 10,
-                    'height': 10,
+                    'width': 5,
+                    'height': 5,
                     'background-color': 'green',
                     
                 }
@@ -74,8 +74,8 @@ window.addEventListener('DOMContentLoaded', function(){
                 selector: "edge[group=\"Community membership\"]",
                 css: {
                     'curve-style': 'bezier',
-                    'target-arrow-shape': 'triangle',
-                    'width': 2,
+                    //'target-arrow-shape': 'triangle',
+                    'width': 0.5,
                     'opacity': 0.5,
                     "line-color": 'black'
                 }
@@ -84,8 +84,8 @@ window.addEventListener('DOMContentLoaded', function(){
                 selector: "edge[group=\"Partnership\"]",
                 css: {
                     'curve-style': 'bezier',
-                    'target-arrow-shape': 'triangle',
-                    'width': 2,
+                    //'target-arrow-shape': 'triangle',
+                    'width': 0.5,
                     'opacity': 0.5,
                     "line-color": 'purple'
                 }

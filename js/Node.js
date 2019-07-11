@@ -3,12 +3,17 @@ function addAgent() {
     var content = document.getElementById("content");
     content.innerHTML ="";
     data.oldNbAsset = 0;
-    data.old_onglet = "asset_1";
+    data.old_tab = "asset_1";
 
     // choice of the type of the node
     var div = document.createElement("div");
-    div.textContent = "Agent type : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Agent type : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm1 = document.createElement("select");
+    
     var opt = document.createElement("option");
     opt.setAttribute("value", undefined);
     opt.innerText = 'Select...';
@@ -21,10 +26,17 @@ function addAgent() {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "agent_type"
+    new SlimSelect({
+        select: '#agent_type'
+    })
    
     // choice of the name
     var div = document.createElement("div");
-    div.textContent = "Agent name : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Agent name : ";
+    div.appendChild(h3);
+    div.className = "form";
     var textElm = document.createElement("input");
     textElm.id = "node_name";
     textElm.type = "text";
@@ -41,7 +53,7 @@ function addAgent() {
             var id_node = data.node.length;
         }
         textElm.value = choice.target.value +' ' + String(id_node);
-        this.options[0].disabled = true;
+        this.slim.data.data[0].disabled= true;
 
         
 
@@ -56,11 +68,14 @@ function addAgent() {
             if(tab != null) {
                 content.removeChild(tab);
                 data.oldNbAsset = 0;
-                data.old_onglet = "asset_1";  
+                data.old_tab = "asset_1";  
             }
             // choice of the Community objective:
             var div = document.createElement("div");
-            div.textContent = "Community objective : ";
+            var h3 = document.createElement("h3");
+            h3.textContent = "Community objective : ";
+            div.appendChild(h3);
+            div.className = "form";
             div.id = "community_objective"
             var selctElm1 = document.createElement("select");
             for (choice of choices.comObjective){
@@ -72,6 +87,10 @@ function addAgent() {
             div.appendChild(selctElm1);
             var buttonelm = document.getElementById("button_add_node");
             content.insertBefore(div,buttonelm);
+            selctElm1.id = "select_community_objective"
+            new SlimSelect({
+                select: '#select_community_objective'
+            })
 
         } else if (choice.target.value == choices.typeNode[0]){
             var input = document.getElementById("community_objective");
@@ -79,18 +98,24 @@ function addAgent() {
                     content.removeChild(input);
                 }
             var div = document.createElement("div");
-            div.textContent = "Number of assets : ";
+            var h3 = document.createElement("h3");
+            h3.textContent = "Number of assets : ";
+            div.appendChild(h3);
+            div.className = "form";
+
             div.id = "Number_asset";
             var numberElm = document.createElement("input");
             numberElm.type = "number";
             numberElm.step = 1;
             numberElm.min = 1;
             numberElm.value = 1;
+            numberElm.id = "nb_asset";
             div.appendChild(numberElm);
             var buttonelm = document.getElementById("button_add_node");
             content.insertBefore(div,buttonelm);
 
             var div = document.createElement("div");
+            div.appendChild(document.createElement("br"));
             div.className = "tabs";
             div.id = "tabs";
             div.nb = 1;
@@ -100,21 +125,23 @@ function addAgent() {
             data.oldNbAsset = 1;  
 
             numberElm.onchange = function(choice) {
-                console.log(data.oldNbAsset)
+                //console.log(data.oldNbAsset)
                 
-                var nb_asset = choice.target.value;
-                var wrap_tab = document.getElementById("onglets");
-                var wrap_tabcontent = document.getElementById("contenu_onglets")
-                if (nb_asset < data.oldNbAsset) {
-                    for (var indice= Number(nb_asset)+1; indice < Number(data.oldNbAsset)+1; indice++) {
-                        var tabs = document.getElementById('onglet_asset_' + String(indice));
-                        var tabs2 = document.getElementById('contenu_onglet_asset_' + String(indice));
+                var nb_asset = Number(choice.target.value);
+                var wrap_tab = document.getElementById("tab");
+                var wrap_tabcontent = document.getElementById("content_tab")
+                if (nb_asset < Number(data.oldNbAsset)) {
+                    for (var index= Number(nb_asset)+1; index < Number(data.oldNbAsset)+1; index++) {
+                        
+                        var tabs = document.getElementById('tab_asset_' + String(index));
+                        var tabs2 = document.getElementById('content_tab_asset_' + String(index));
                         if(tabs != null){
                             wrap_tab.removeChild(tabs);
                             wrap_tabcontent.removeChild(tabs2);
                         }
                     }
-                } else if (nb_asset > data.oldNbAsset) {
+                } else if (nb_asset > Number(data.oldNbAsset)) {
+                    //console.log(nb_asset);
                     var div = document.getElementById("tabs");
                     div.className = "tabs";
                     div.nb = nb_asset;
@@ -130,7 +157,11 @@ function addAgent() {
     
     // choice of trading partners
     var div = document.createElement("div");
-    div.textContent = "Trading partners : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Trading partners : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm2 = document.createElement("select");
     selctElm2.id = 'trading';
     selctElm2.multiple = "multiple";
@@ -161,6 +192,10 @@ function addAgent() {
 
         var div = document.getElementById("Community_membership");
         var div2 = document.createElement("div");
+        var h3 = document.createElement("h3");
+        div2.appendChild(h3);
+        div2.className = "form";
+        h3.textContent = "Community membership  :"; 
         var selctElm3 = document.createElement("select");
         selctElm3.multiple = "multiple";
         selctElm3.size = 2;
@@ -187,20 +222,14 @@ function addAgent() {
                 selctElm3.appendChild(opt); 
             } 
         }
-        
         if (div != null) {
-            console.log("ok2")
-            div2.textContent = div.innerHTML.split("<")[0] ;
             content.replaceChild(div2,div);
         } else {
             if (selctElm1.options[selctElm1.selectedIndex].value == choices.typeNode[0]){
-                div2.textContent = "Community membership  :"; 
                 content.insertBefore(div2,asset);
-
-            } else if (selctElm1.options[selctElm1.selectedIndex].value == choices.typeNode[1]) {
-                div2.textContent = "Community membership  :"; 
+            } else if (selctElm1.options[selctElm1.selectedIndex].value == choices.typeNode[1]) {  
                 content.insertBefore(div2,input);
-} 
+            } 
         } 
         
         div2.appendChild(selctElm3);
@@ -227,7 +256,8 @@ function clicAddNode() {
     console.log('Saving...')
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
-    var inputs = content.getElementsByTagName("input");
+    var input_name = document.getElementById("node_name");
+    var input_asset = document.getElementById("nb_asset");
 
     var links = []; // { data: {id :'', source: '', target: '' } },
 
@@ -272,7 +302,7 @@ function clicAddNode() {
     }
 
     
-    var name = inputs[0].value;
+    var name = input_name.value;
     if ( data.idNodeUnused.length >0 ) {
         var id_node = data.idNodeUnused.shift();                
     } else {
@@ -327,23 +357,83 @@ function clicAddNode() {
     // Create the assets
     var typeAgent ='';
     if (type_node == choices.typeNode[0]){
-        var nb_asset = inputs[3].value;
-        var offset_select = choices.nbFormAsset[0];
-        var offset_input = choices.nbFormAsset[1];
-        for (var indice=0; indice<nb_asset; indice++){
+        var nb_asset = input_asset.value;             
+
+        
+        for (var index=0; index<nb_asset; index++){
+            flag_power = true;
             if ( data.idAssetUnused.length >0 ) {
                 var id_asset = data.idAssetUnused.shift();                
             } else {
-            var id_asset = data.asset.length;
+                var id_asset = data.asset.length;
             }
             agent_temp.asset.push(id_asset);
+            var asset_temp = new Asset(id_asset,'','', '', '', 0, 0,  [], [],  '', '',[]);
 
-            var asset_type = selects[3+offset_select*indice].options[selects[3+offset_select*indice].selectedIndex].value;
-            var function_type = selects[4+offset_select*indice].options[selects[4+offset_select*indice].selectedIndex].value;
+            for (key of choices.featAsset){
+                var form = document.getElementById(key + String(index));
+                if (form != null){
+                    if (key == "type" || key =="functionType" || key =="uncertaintyType" ){
+                        asset_temp[key] = form.options[form.selectedIndex].value;
+                    } else if ( key == "name"){
+                        asset_temp[key] = form.value;
+                    } else if (form.type == "text"){
+                        
+                        if (key == "functionCharac"){
+                            function_type = asset_temp.functionType;
+                        }
+                        else if (key == "uncertainCharac"){
+                            function_type = asset_temp.uncertaintyType;
+                        }
+                        var chain_features = form.value;
+                        var feat =[];
+                        var feat_temps ='';
+                        k = 0;
+                        
+                        for (chiffre of chain_features) {
+                            if (k < choices.nbFeature[function_type]) {
+                                if (chiffre !== ';') {
+                                    feat_temps = feat_temps + chiffre;
+                                } else {
+                                    number = Number(feat_temps);
+                                    if (number != number) {
+                                        console.log("Warning it was not the good syntax")
+                                        asset_name = asset_name + 'syntax error'
+                                    }
+                                    feat.push(number);
+                                    feat_temps = '';
+                                    k = k+1;
+                                }
+                            }
+                        }
+                        if (k < choices.nbFeature[function_type]){
+                            number = Number(feat_temps);
+                            if (number != number) {
+                                console.log("Warning it was not the good syntax");
+                                number =0;
+                            }
+                            feat.push(number);
+                        }
+                        asset_temp[key] = feat;
+                    } else if (form.type == "number"){
+                        if(flag_power){
+                            asset_temp.Pmaxcap = form.value;
+                            flag_power = false;
+                        } else {
+                            asset_temp.Pmincap = form.value;
+                            flag_power = true;
+                        }
 
-            var asset_name = inputs[4 + offset_input* indice].value; // beware there are input invisible because of the add of multiple select
-            var Pmax = Number(inputs[6 + offset_input* indice].value);
-            var Pmin = Number(inputs[7 + offset_input* indice].value);
+                    }
+
+                }
+            }
+            if(!flag_power){
+                asset_temp.Pmincap = asset_temp.Pmaxcap;
+            }
+
+            var Pmax = Number(asset_temp.Pmaxcap);
+            var Pmin = Number(asset_temp.Pmincap);
 
             if (Pmin > Pmax) {
                 console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify by modify asset or agent");
@@ -351,6 +441,8 @@ function clicAddNode() {
                 Pmax = Pmin;
                 Pmin = P_temp;
             }
+            asset_temp.Pmaxcap = Pmax;
+            asset_temp.Pmincap = Pmin;
 
             if (typeAgent != choices.typeAgent[2]){
                 if ((typeAgent == choices.typeAgent[0] && Pmax >0) || (typeAgent == choices.typeAgent[1] && Pmin < 0)) {
@@ -366,38 +458,44 @@ function clicAddNode() {
                 }
             }
             
-            var chain_features =inputs[5+offset_input*indice].value;
-            var feat =[];
-            var feat_temps ='';
-            k = 0;
-            for (chiffre of chain_features) {
-                if (k < choices.nbFeature[function_type]) {
-                    if (chiffre !== ';') {
-                        feat_temps = feat_temps + chiffre;
-                    } else {
-                        number = Number(feat_temps);
-                        if (number != number) {
-                            console.log("Warning it was not the good syntax")
-                            asset_name = asset_name + 'syntax error'
-                        }
-                        feat.push(number);
-                        feat_temps = '';
-                        k = k+1;
+            if (asset_temp.type == choices.typeAsset[0]){
+                if (data.multipleStep_1[index] != undefined){
+                    var Pmaxt = [];
+                    for (pow of data.multipleStep_1[index]){
+                        Pmaxt.push(Number(pow));
                     }
-                }
+                    asset_temp.Pmaxt = Pmaxt;
+                    var len = data.multipleStep_1[index].length;
+                    if (len > data.timeMax){
+                        data.timeMax = len;
+                    }
+                } 
+                if (data.multipleStep_2[index] != undefined){
+                    var Pmint = [];
+                    for (pow of data.multipleStep_2[index]){
+                        Pmint.push(Number(pow));
+                    }
+                    asset_temp.Pmint = Pmint;
+                    var len = data.multipleStep_2[index].length;
+                    if (len > data.timeMax){
+                        data.timeMax = len;
+                    }
+                }  
+            } else if (asset_temp.type == choices.typeAsset[1]){
+                if (data.multipleStep_1[index] != undefined){
+                    var Pt = [];
+                    for (pow of data.multipleStep_1[index]){
+                        Pt.push(Number(pow));
+                    }
+                    asset_temp.Pmt = Pt;
+                    var len = data.multipleStep_1[index].length;
+                    if (len > data.timeMax){
+                        data.timeMax = len;
+                    }
+                } 
             }
-            if (k < choices.nbFeature[function_type]){
-                number = Number(feat_temps);
-                if (number != number) {
-                    console.log("Warning it was not the good syntax");
-                    number =0;
-                }
-                feat.push(number);
-            }
-            
-            
-
-            var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
+            data.multipleStep_1[index] = [];
+            data.multipleStep_2[index] = [];
             data.asset[id_asset] = asset_temp;
         }
         agent_temp.typeAgent = typeAgent;
@@ -424,15 +522,22 @@ function clicAddNode() {
     addAgent();
 }
 
-function modAgCom(nodeId) {
+function modAgCom(NodeId) {
     var content = document.getElementById("content");
+    var nodeId = Number(NodeId);
     var oldNode = data.node[nodeId];
     
     content.innerHTML ="";
+    data.oldNbAsset = 0;
+    data.old_tab = "asset_1";
 
     // choice of the type of the node
     var div = document.createElement("div");
-    div.textContent = "Agent type : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Agent type : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm1 = document.createElement("select");
     
     for (choice of choices.typeNode){
@@ -447,10 +552,18 @@ function modAgCom(nodeId) {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "node_type"
+    new SlimSelect({
+        select: '#node_type'
+    })
    
     // choice of the name
     var div = document.createElement("div");
-    div.textContent = "Agent name : ";
+    div.className = "form";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Agent name : ";
+    div.appendChild(h3);
+    
     var textElm = document.createElement("input");
     textElm.id = "node_name";
     textElm.type = "text";
@@ -462,7 +575,11 @@ function modAgCom(nodeId) {
 
     // choice of trading partners 
     var div = document.createElement("div");
-    div.textContent = "Trading partners : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Trading partners : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm2 = document.createElement("select");
     selctElm2.id = 'trading';
     selctElm2.multiple = "multiple";
@@ -491,7 +608,10 @@ function modAgCom(nodeId) {
     
     // choice of community membership
     var div = document.createElement("div");
-    div.textContent = "Community membership : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Community membership : ";
+    div.appendChild(h3);
+    div.className = "form";
     div.id = "Community_membership";
     var selctElm3 = document.createElement("select");
     selctElm3.multiple = "multiple";
@@ -502,15 +622,18 @@ function modAgCom(nodeId) {
     opt.innerText = 'None';
     selctElm3.appendChild(opt);
     for(admin of data.node) {
-        if(admin.type == choices.typeNode[1] && !oldNode.partners.includes(node.id) && admin.id != oldNode.id ){
-            var opt = document.createElement("option");
-            opt.setAttribute("value", admin.id);
-            opt.innerText = admin.name;
-            selctElm3.appendChild(opt); 
-            if(oldNode.administrator.includes(admin.id)) {
-                opt.selected = "selected";
+        if (admin != undefined) {
+            if(admin.type == choices.typeNode[1] && !oldNode.partners.includes(node.id) && admin.id != oldNode.id ){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", admin.id);
+                opt.innerText = admin.name;
+                selctElm3.appendChild(opt); 
+                if(oldNode.administrator.includes(admin.id)) {
+                    opt.selected = "selected";
+                }
             }
         }
+        
         
     } 
     div.appendChild(selctElm3);
@@ -521,7 +644,10 @@ function modAgCom(nodeId) {
 
     if(oldNode.type == choices.typeNode[1]){
         var div = document.createElement("div");
-        div.textContent = "Community objective : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Community objective : ";
+        div.appendChild(h3);
+        div.className = "form";
         div.id = "community_objective"
         var selctElm4 = document.createElement("select");
         for (choice of choices.comObjective){
@@ -535,10 +661,17 @@ function modAgCom(nodeId) {
         }
         div.appendChild(selctElm4);
         content.appendChild(div);
-
+        selctElm4.id = "select_community_objective"
+        new SlimSelect({
+            select: '#select_community_objective'
+        })
 
         var div = document.createElement("div");
-        div.textContent = "Community members : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Community members : ";
+        div.appendChild(h3);
+        div.className = "form";
+        
         div.id = "Community_members";
         var selctElm5 = document.createElement("select");
         selctElm5.multiple = "multiple";
@@ -549,14 +682,15 @@ function modAgCom(nodeId) {
         opt.innerText = 'None';
         selctElm5.appendChild(opt);
         for(node of data.node) {
-            if (!oldNode.partners.includes(node.id) && oldNode.administrator.includes(node.id)  && node.id != oldNode.id  )
-            var opt = document.createElement("option");
-            opt.setAttribute("value", node.id);
-            opt.innerText = node.name;
-            selctElm5.appendChild(opt); 
-            if(oldNode.communityMember.includes(node.id)) {
-                opt.selected = "selected";
-            } 
+            if (!oldNode.partners.includes(node.id) && oldNode.administrator.includes(node.id)  && node.id != oldNode.id  ){
+                var opt = document.createElement("option");
+                opt.setAttribute("value", node.id);
+                opt.innerText = node.name;
+                selctElm5.appendChild(opt); 
+                if(oldNode.communityMember != undefined && oldNode.communityMember.includes(node.id)) {
+                    opt.selected = "selected";
+                }
+            }
         } 
         div.appendChild(selctElm5);
         content.appendChild(div);
@@ -566,6 +700,7 @@ function modAgCom(nodeId) {
     } else if (oldNode.type == choices.typeNode[0]){
         
         var div = document.createElement("div");
+        div.appendChild(document.createElement("br"));
         div.id = "tabs"
         div.className = "tabs";
         div.nb = oldNode.asset.length;
@@ -578,11 +713,11 @@ function modAgCom(nodeId) {
 
     // save of new data
     var div = document.createElement("div");
-    div.id = "button_add_node";
+    div.id = "button_mod_node";
     var buttonelm = document.createElement("input");
 
     buttonelm.type = "button";
-    buttonelm.value = "Add node";
+    buttonelm.value = "update node";
     buttonelm.onclick = clicModNode(nodeId);
     div.appendChild(buttonelm);
     content.appendChild(div);   
@@ -591,7 +726,7 @@ function modAgCom(nodeId) {
         var content = document.getElementById("content");
         var textElm = document.getElementById("node_name");
         textElm.value = choice.target.value + ' ' + String(oldNode.id);
-        var buttonelm = document.getElementById("button_add_node");
+        var buttonelm = document.getElementById("button_mod_node");
 
         if (choice.target.value == choices.typeNode[1]) {
             
@@ -604,7 +739,10 @@ function modAgCom(nodeId) {
            
             // choice of the Community objective:
             var div = document.createElement("div");
-            div.textContent = "Community objective : ";
+            var h3 = document.createElement("h3");
+            h3.textContent =  "Community objective : ";
+            div.appendChild(h3);
+            div.className = "form";
             div.id = "community_objective"
             var selctElm1 = document.createElement("select");
             for (choice of choices.comObjective){
@@ -619,9 +757,16 @@ function modAgCom(nodeId) {
             div.appendChild(selctElm1);
             
             content.insertBefore(div,buttonelm);
+            selctElm1.id = "select_community_objective"
+            new SlimSelect({
+                select: '#select_community_objective'
+            })
 
             var div = document.createElement("div");
-            div.textContent = "Community members : ";
+            var h3 = document.createElement("h3");
+            h3.textContent =  "Community members : ";
+            div.appendChild(h3);
+            div.className = "form";
             div.id = "Community_members";
             var selctElm4 = document.createElement("select");
             selctElm4.multiple = "multiple";
@@ -660,6 +805,7 @@ function modAgCom(nodeId) {
                 }
 
             var div = document.createElement("div");
+            div.appendChild(document.createElement("br"));
             div.id = "tabs"
             div.className = "tabs";
             div.nb = oldNode.asset.length;
@@ -686,7 +832,10 @@ function modAgCom(nodeId) {
         }
         
         var div2 = document.createElement("div");
-        div2.textContent = "Community membership : ";
+        var h3 = document.createElement("h3");
+        h3.textContent =  "Community membership : ";
+        div2.appendChild(h3);
+        div2.className = "form";
         var selctElm3 = document.createElement("select");
         selctElm3.multiple = "multiple";
         selctElm3.id ="community";
@@ -752,7 +901,11 @@ function modAgCom(nodeId) {
             var div = document.getElementById("Community_members");
 
             var div2 = document.createElement("div");
-            div2.textContent = "Community members : ";
+            var h3 = document.createElement("h3");
+            h3.textContent =  "Community members : ";
+            div.appendChild(h3);
+            div.className = "form";
+            
             var selctElm5 = document.createElement("select");
             selctElm5.multiple = "multiple";
             selctElm5.size = 2;
@@ -762,14 +915,15 @@ function modAgCom(nodeId) {
             opt.innerText = 'None';
             selctElm5.appendChild(opt);
             for(node of data.node) {
-                if (!trading_partners.includes(node.id) && admins.includes(node.id)  && node.id != oldNode.id )
-                var opt = document.createElement("option");
-                opt.setAttribute("value", node.id);
-                opt.innerText = node.name;
-                selctElm5.appendChild(opt); 
-                if(oldNode.communityMember.includes(node.id)) {
-                    opt.selected = "selected";
-                } 
+                if (!trading_partners.includes(node.id) && admins.includes(node.id)  && node.id != oldNode.id ) {
+                    var opt = document.createElement("option");
+                    opt.setAttribute("value", node.id);
+                    opt.innerText = node.name;
+                    selctElm5.appendChild(opt); 
+                    if(oldNode.communityMember.includes(node.id)) {
+                        opt.selected = "selected";
+                    } 
+                }
             } 
             div2.appendChild(selctElm5);
             content.replaceChild(div2,div)
@@ -791,11 +945,11 @@ function clicModNode(nodeId) {
         var name = text.value;
         var id_agent = Number(nodeId);
         var oldNode = data.node[id_agent];
-        var asset = oldNode.asset; // the id of asset can't change
-
+        var asset = oldNode.asset; // the id of asset won't change
+        
         // remove the old element
 
-        hDelAgent(id_agent);
+        hDelAgent(id_agent,false);
         data.idNodeUnused.pop(); // we must keep the id as used 
             
         // create the new element
@@ -859,7 +1013,7 @@ function clicModNode(nodeId) {
             }
             
             var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,[],[],objective, members);
-        } else if (type_node == options.typeNode[0]){
+        } else if (type_node == choices.typeNode[0]){
             var agent_temp = new Node(id_agent,type_node,name,trading_partners,administrators,asset,[] );
         }
             
@@ -907,21 +1061,83 @@ function clicModNode(nodeId) {
 
         }
         var node_group = type_node;
+        
+        console.log(agent_temp)
+        
         //update the assets
-        var agentType = '';
+        var typeAgent = '';
         if (type_node == choices.typeNode[0]){
-            var nb_asset = agent.asset.length;
-            var offset_select = choices.nbFormAsset[0];
-            var offset_input = choices.nbFormAsset[1];
-            for (var indice=0; indice<nb_asset; indice++){
-                var id_asset = agent.asset[indice];
-                
-                var asset_type = selects[3+offset_select*indice].options[selects[3+offset_select*indice].selectedIndex].value;
-                var function_type = selects[4+offset_select*indice].options[selects[4+offset_select*indice].selectedIndex].value;
+            var nb_asset = agent_temp.asset.length;
+            for (var index=0; index<nb_asset; index++){
+                flag_power = true;
+                var id_asset = agent_temp.asset[index];
 
-                var asset_name = inputs[3 + offset_input*indice].value;
-                var Pmax = Number(inputs[5 + offset_input* indice].value);
-                var Pmin = Number(inputs[6 + offset_input* indice].value);
+                var asset_temp = data.asset[id_asset];
+    
+
+                for (key of choices.featAsset){
+                    var form = document.getElementById(key + String(index));
+                    if (form != null){
+                        if (key == "type" || key =="functionType" || key =="uncertaintyType" ){
+                            asset_temp[key] = form.options[form.selectedIndex].value;
+                        } else if (key == "name"){
+                            asset_temp[key] = form.value;
+                        } else if (form.type == "text"){
+                            
+                            if (key == "functionCharac"){
+                                function_type = asset_temp.functionType;
+                            }
+                            else if (key == "uncertainCharac"){
+                                function_type = asset_temp.uncertaintyType;
+                            }
+                            var chain_features = form.value;
+                            var feat =[];
+                            var feat_temps ='';
+                            k = 0;
+                            
+                            for (chiffre of chain_features) {
+                                if (k < choices.nbFeature[function_type]) {
+                                    if (chiffre !== ';') {
+                                        feat_temps = feat_temps + chiffre;
+                                    } else {
+                                        number = Number(feat_temps);
+                                        if (number != number) {
+                                            console.log("Warning it was not the good syntax")
+                                            asset_name = asset_name + 'syntax error'
+                                        }
+                                        feat.push(number);
+                                        feat_temps = '';
+                                        k = k+1;
+                                    }
+                                }
+                            }
+                            if (k < choices.nbFeature[function_type]){
+                                number = Number(feat_temps);
+                                if (number != number) {
+                                    console.log("Warning it was not the good syntax");
+                                    number =0;
+                                }
+                                feat.push(number);
+                            }
+                            asset_temp[key] = feat;
+                        } else if (form.type == "number"){
+                            if(flag_power){
+                                asset_temp.Pmaxcap = form.value;
+                                flag_power = false;
+                            } else {
+                                asset_temp.Pmincap = form.value;
+                                flag_power = true;
+                            }
+    
+                        }
+    
+                    }
+                }
+                if(!flag_power){
+                    asset_temp.Pmincap = asset_temp.Pmaxcap;
+                }
+                var Pmax = Number(asset_temp.Pmaxcap);
+                var Pmin = Number(asset_temp.Pmincap);
 
                 if (Pmin > Pmax) {
                     console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify by modify asset or agent");
@@ -929,58 +1145,66 @@ function clicModNode(nodeId) {
                     Pmax = Pmin;
                     Pmin = P_temp;
                 }
-    
-                if (agentType != choices.agentType[2]){
-                    if ((agentType == choices.agentType[0] && Pmax >0) || (agentType == choices.agentType[1] && Pmin < 0)) {
-                        agentType = choices.agentType[2];
-                    } else if (agentType == '') {
+                asset_temp.Pmaxcap = Pmax;
+                asset_temp.Pmincap = Pmin;
+
+                if (typeAgent != choices.typeAgent[2]){
+                    if ((typeAgent == choices.typeAgent[0] && Pmax >0) || (typeAgent == choices.typeAgent[1] && Pmin < 0)) {
+                        typeAgent = choices.typeAgent[2];
+                    } else if (typeAgent == '') {
                         if (Pmax<=0){
-                            agentType = choices.agentType[0];
+                            typeAgent = choices.typeAgent[0];
                         } else if (Pmin>= 0) {
-                            agentType = choices.agentType[1];
+                            typeAgent = choices.typeAgent[1];
                         } else {
-                            agentType = choices.agentType[2];
+                            typeAgent = choices.typeAgent[2];
                         }
                     }
                 }
                 
-                var chain_features =inputs[4 + offset_input*indice].value;
-                var feat =[];
-                var feat_temps ='';
-                k = 0;
-                for (chiffre of chain_features) {
-                    if (k < choices.nbFeature[function_type]) {
-                        if (chiffre !== ';') {
-                            feat_temps = feat_temps + chiffre;
-                        } else {
-                            number = Number(feat_temps);
-                            if (number != number) {
-                                console.log("Warning it was not the good syntax, feature set to 0")
-                                asset_name = asset_name + 'syntax error'
-                                numer = 0;
-                            }
-                            feat.push(number);
-                            feat_temps = '';
-                            k = k+1;
+                if (asset_temp.type == choices.typeAsset[0]){
+                    if (data.multipleStep_1[index] != undefined){
+                        var Pmaxt = [];
+                        for (pow of data.multipleStep_1[index]){
+                            Pmaxt.push(Number(pow));
                         }
-                    }
+                        asset_temp.Pmaxt = Pmaxt;
+                        var len = data.multipleStep_1[index].length;
+                        if (len > data.timeMax){
+                            data.timeMax = len;
+                        }
+                    } 
+                    if (data.multipleStep_2[index] != undefined){
+                        var Pmint = [];
+                        for (pow of data.multipleStep_2[index]){
+                            Pmint.push(Number(pow));
+                        }
+                        asset_temp.Pmint = Pmint;
+                        var len = data.multipleStep_2[index].length;
+                        if (len > data.timeMax){
+                            data.timeMax = len;
+                        }
+                    }  
+                } else if (asset_temp.type == choices.typeAsset[1]){
+                    if (data.multipleStep_1[index] != undefined){
+                        var Pt = [];
+                        for (pow of data.multipleStep_1[index]){
+                            Pt.push(Number(pow));
+                        }
+                        asset_temp.Pmt = Pt;
+                        var len = data.multipleStep_1[index].length;
+                        if (len > data.timeMax){
+                            data.timeMax = len;
+                        }
+                    } 
                 }
-                if (k < choices.nbFeature[function_type]){
-                    number = Number(feat_temps);
-                    if (number != number) {
-                    console.log("Warning it was not the good syntax")
-                    }
-                    feat.push(number);
-                }
-                var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
+                data.multipleStep_1[index] = [];
+                data.multipleStep_2[index] = [];
                 data.asset[id_asset] = asset_temp;
+                data.node[nodeId].typeAgent = typeAgent;  
             }
-            data.Node[nodeId].typeAgent = typeAgent;
             node_group = typeAgent;
         }
-
-
-
         // update the graphe
         cy.add({ data: { id: id_agent, name: name, group:node_group } })
         cy.add(links);
@@ -1001,41 +1225,56 @@ function addAsset(){
     var content = document.getElementById("content");
     content.innerHTML ="";
     data.oldNbAsset = 0;
-    data.old_onglet = "asset_1";
+    data.old_tab = "asset_1";
 
     // choice of the node
     var div = document.createElement("div");
-    div.textContent = "Agent : ";
+    var h3 = document.createElement("h3");
+    h3.textContent =  "Agent : ";
+    div.appendChild(h3);
+    div.className = "form"; 
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
     opt.setAttribute("value", undefined);
     opt.innerText = 'Select...';
     selctElm1.appendChild(opt);
+    selctElm1.id = "node";
     for (agent of data.node){
-        if (agent.type == choices.typeNode[0]) {
+        if (agent != undefinded) {
+            if (agent.type == choices.typeNode[0]) {
             var opt = document.createElement("option");
             opt.setAttribute("value", agent.id);
             opt.innerText = agent.name;
             selctElm1.appendChild(opt);  
+            }
         }
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    new SlimSelect({
+        select: '#node'
+    })
 
     // choice of the number of asset 
     var div = document.createElement("div");
-    div.textContent = "Number of assets : ";
+    var h3 = document.createElement("h3");
+    h3.textContent =  "Number of assets : ";
+    div.appendChild(h3);
+    div.className = "form"; 
+
     div.id = "Number_asset";
     var numberElm = document.createElement("input");
     numberElm.type = "number";
     numberElm.step = 1;
     numberElm.min = 1;
     numberElm.value = 1;
+    numberElm.id = "nb_asset";
     div.appendChild(numberElm);
     
     content.appendChild(div);
 
     var div = document.createElement("div");
+    div.appendChild(document.createElement("br"));
     div.className = "tabs";
     div.id = "tabs";
     div.nb = 1;
@@ -1046,15 +1285,15 @@ function addAsset(){
 
     numberElm.onchange = function(choice) {
         var buttonelm = document.getElementById("button_add_asset");
-        console.log(data.oldNbAsset)
+        //console.log(data.oldNbAsset)
         
-        var nb_asset = choice.target.value;
-        var wrap_tab = document.getElementById("onglets");
-        var wrap_tabcontent = document.getElementById("contenu_onglets")
-        if (nb_asset < data.oldNbAsset) {
-            for (var indice= Number(nb_asset)+1; indice < Number(data.oldNbAsset)+1; indice++) {
-                var tabs = document.getElementById('onglet_asset_' + String(indice));
-                var tabs2 = document.getElementById('contenu_onglet_asset_' + String(indice));
+        var nb_asset = Number(choice.target.value);
+        var wrap_tab = document.getElementById("tab");
+        var wrap_tabcontent = document.getElementById("content_tab")
+        if (nb_asset < Number(data.oldNbAsset)) {
+            for (var index= Number(nb_asset)+1; index < Number(data.oldNbAsset)+1; index++) {
+                var tabs = document.getElementById('tab_asset_' + String(index));
+                var tabs2 = document.getElementById('content_tab_asset_' + String(index));
                 if(tabs != null){
                     wrap_tab.removeChild(tabs);
                     wrap_tabcontent.removeChild(tabs2);
@@ -1092,90 +1331,163 @@ function clicAddAsset(){
     console.log('Saving...')
     var content = document.getElementById("content");
     var selects = content.getElementsByTagName("select");
-    var inputs = content.getElementsByTagName("input");
+    var input = document.getElementById("nb_asset");
     
     var id_agent = selects[0].options[selects[0].selectedIndex].value;
 
-    var nb_asset = inputs[0].value;
+    var nb_asset = input.value;
 
     
     var typeAgent = data.node[id_agent].typeAgent;
-    for (var indice=0; indice<nb_asset; indice++){
+    for (var index=0; index<nb_asset; index++){
+        flag_power = true;
         if ( data.idAssetUnused.length >0 ) {
             var id_asset = data.idAssetUnused.shift();                
         } else {
-         var id_asset = data.asset.length;
+            var id_asset = data.asset.length;
         }
-        data.node[id_agent].asset.push(id_asset);
+        var asset_temp = new Asset(id_asset,'','', '', '', 0, 0, 0, [], [], [], '', '',[]);
 
-        var asset_type = selects[1+2*indice].options[selects[1+2*indice].selectedIndex].value;
-        var function_type = selects[2+2*indice].options[selects[2+2*indice].selectedIndex].value;
+        for (key of choices.featAsset){
+            var form = document.getElementById(key + String(index));
+            if (form != null){
+                if (key == "type" || key =="functionType" || key =="uncertaintyType" ){
+                    asset_temp[key] = form.options[form.selectedIndex].value;
+                } else if (key == "name"){
+                    asset_temp[key] = form.value;
+                } else if (form.type == "text"){
+                    
+                    if (key == "functionCharac"){
+                        function_type = asset_temp.functionType;
+                    }
+                    else if (key == "uncertainCharac"){
+                        function_type = asset_temp.uncertaintyType;
+                    }
+                    var chain_features = form.value;
+                    var feat =[];
+                    var feat_temps ='';
+                    k = 0;
+                    
+                    for (chiffre of chain_features) {
+                        if (k < choices.nbFeature[function_type]) {
+                            if (chiffre !== ';') {
+                                feat_temps = feat_temps + chiffre;
+                            } else {
+                                number = Number(feat_temps);
+                                if (number != number) {
+                                    console.log("Warning it was not the good syntax")
+                                    asset_name = asset_name + 'syntax error'
+                                }
+                                feat.push(number);
+                                feat_temps = '';
+                                k = k+1;
+                            }
+                        }
+                    }
+                    if (k < choices.nbFeature[function_type]){
+                        number = Number(feat_temps);
+                        if (number != number) {
+                            console.log("Warning it was not the good syntax");
+                            number =0;
+                        }
+                        feat.push(number);
+                    }
+                    asset_temp[key] = feat;
+                } else if (form.type == "number"){
+                    if(flag_power){
+                        asset_temp.Pmaxcap = form.value;
+                        flag_power = false;
+                    } else {
+                        asset_temp.Pmincap = form.value;
+                        flag_power = true;
+                    }
 
-        var asset_name = inputs[1 + 4*indice].value;
-        var Pmax = Number(inputs[3 + 4* indice].value);
-        var Pmin = Number(inputs[4 + 4* indice].value);
-        
+                }
+
+            }
+        }
+        if(!flag_power){
+            asset_temp.Pmincap = asset_temp.Pmaxcap;
+        }
+        var Pmax = Number(asset_temp.Pmaxcap);
+        var Pmin = Number(asset_temp.Pmincap);
+
         if (Pmin > Pmax) {
-            console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify it by changing asset or agent");
+            console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify by modify asset or agent");
             var P_temp = Pmax;
             Pmax = Pmin;
             Pmin = P_temp;
         }
-        if (typeAgent == '') {
-            if (Pmax<=0){
-                typeAgent = choices.typeAgent[0];
-            } else if (Pmin>= 0) {
-                typeAgent = choices.typeAgent[1];
-            } else {
-                typeAgent = choices.typeAgent[2];
-            }
-        }else if (typeAgent != choices.typeAgent[2]){
+        asset_temp.Pmaxcap = Pmax;
+        asset_temp.Pmincap = Pmin;
+
+        if (typeAgent != choices.typeAgent[2]){
             if ((typeAgent == choices.typeAgent[0] && Pmax >0) || (typeAgent == choices.typeAgent[1] && Pmin < 0)) {
                 typeAgent = choices.typeAgent[2];
-            } 
-        } 
-        
-        var chain_features =inputs[2 + 4*indice].value;
-        var feat =[];
-        var feat_temps ='';
-        k = 0;
-        for (chiffre of chain_features) {
-            if (k < choices.nbFeature[function_type]) {
-                if (chiffre !== ';') {
-                    feat_temps = feat_temps + chiffre;
+            } else if (typeAgent == '') {
+                if (Pmax<=0){
+                    typeAgent = choices.typeAgent[0];
+                } else if (Pmin>= 0) {
+                    typeAgent = choices.typeAgent[1];
                 } else {
-                    number = Number(feat_temps);
-                    if (number != number) {
-                        console.log("Warning it was not the good syntax, feature set to 0")
-                        asset_name = asset_name + 'syntax error'
-                        numer = 0;
-                    }
-                    feat.push(number);
-                    feat_temps = '';
-                    k = k+1;
+                    typeAgent = choices.typeAgent[2];
                 }
             }
         }
-        if (k < choices.nbFeature[function_type]){
-            number = Number(feat_temps);
-            if (number != number) {
-            console.log("Warning it was not the good syntax")
-            }
-            feat.push(number);
+        
+        if (asset_temp.type == choices.typeAsset[0]){
+            if (data.multipleStep_1[index] != undefined){
+                var Pmaxt = [];
+                for (pow of data.multipleStep_1[index]){
+                    Pmaxt.push(Number(pow));
+                }
+                asset_temp.Pmaxt = Pmaxt;
+                var len = data.multipleStep_1[index].length;
+                if (len > data.timeMax){
+                    data.timeMax = len;
+                }
+            } 
+            if (data.multipleStep_2[index] != undefined){
+                var Pmint = [];
+                for (pow of data.multipleStep_2[index]){
+                    Pmint.push(Number(pow));
+                }
+                asset_temp.Pmint = Pmint;
+                var len = data.multipleStep_2[index].length;
+                if (len > data.timeMax){
+                    data.timeMax = len;
+                }
+            }  
+        } else if (asset_temp.type == choices.typeAsset[1]){
+            if (data.multipleStep_1[index] != undefined){
+                var Pt = [];
+                for (pow of data.multipleStep_1[index]){
+                    Pt.push(Number(pow));
+                }
+                asset_temp.Pmt = Pt;
+                var len = data.multipleStep_1[index].length;
+                if (len > data.timeMax){
+                    data.timeMax = len;
+                }
+            } 
         }
-        var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
-        data.asset.push(asset_temp); 
+        data.multipleStep_1[index] = [];
+        data.multipleStep_2[index] = [];
+        data.asset[id_asset] = asset_temp;
+        data.node[id_agent].typeAgent = typeAgent;  
+        data.node[id_agent].asset.push(id_asset)
     }
-    data.node[id_agent].typeAgent = typeAgent;
+    node_group = typeAgent;
 
     // update the graphe
-    console.log(typeAgent)
+
+    //console.log(typeAgent)
     var node = cy.getElementById(String(id_agent));
 
     var links1 = cy.edges('[source = '+ '\"' + String(id_agent) +'\"' +']');
     var links2 = cy.edges('[target = ' +'\"' + String(id_agent)+ '\"' +']');
-    console.log(links1);
-    console.log(links2)
+    //console.log(links1);
+    //console.log(links2)
     cy.remove(node);
     cy.add({ data: { id: id_agent, name: data.node[id_agent].name, group: typeAgent} })
     links1.restore();
@@ -1192,7 +1504,12 @@ function clicAddAsset(){
 function modAsset(nodeId){
     var content = document.getElementById("content");
     content.innerHTML ="";
+    data.oldNbAsset = 0;
+    data.old_tab = "asset_1";
+
+
     var div = document.createElement("div");
+    div.appendChild(document.createElement("br"));
     div.className = "tabs";
     div.agent = data.node[nodeId]
     div.nb = data.node[nodeId].asset.length;
@@ -1223,52 +1540,159 @@ function clicModAsset(nodeId) {
         var inputs = content.getElementsByTagName("input");
         
         var id_agent = nodeId;
-        var agent = data.node[id_agent];
-        var nb_asset = agent.asset.length;
-        for (var indice=0; indice<nb_asset; indice++){
-            var id_asset = agent.asset[indice];
-            
-            var asset_type = selects[2*indice].options[selects[2*indice].selectedIndex].value;
-            var function_type = selects[1+2*indice].options[selects[1+2*indice].selectedIndex].value;
+        var agent_temp = data.node[id_agent];
+                
+        var nb_asset = agent_temp.asset.length;
+        typeAgent ='';
+        for (var index=0; index<nb_asset; index++){
+            var id_asset = agent_temp.asset[index];
+            var flag_power = true;
+            var asset_temp = data.asset[id_asset];
 
-            var asset_name = inputs[0 + 4*indice].value;
-            var Pmax = Number(inputs[2 + 4* indice].value);
-            var Pmin = Number(inputs[3 + 4* indice].value);
-            
-            var chain_features =inputs[1 + 4*indice].value;
-            var feat =[];
-            var feat_temps ='';
-            k = 0;
-            for (chiffre of chain_features) {
-                if (k < choices.nbFeature[function_type]) {
-                    if (chiffre !== ';') {
-                        feat_temps = feat_temps + chiffre;
-                    } else {
-                        number = Number(feat_temps);
-                        if (number != number) {
-                            console.log("Warning it was not the good syntax, feature set to 0")
-                            asset_name = asset_name + 'syntax error'
-                            numer = 0;
+            for (key of choices.featAsset){
+                var form = document.getElementById(key + String(index));
+                if (form != null){
+                    if (key == "type" || key =="functionType" || key =="uncertaintyType" ){
+                        asset_temp[key] = form.options[form.selectedIndex].value;
+                    } else if ( key == "name"){
+                        asset_temp[key] = form.value;
+                    } else if (form.type == "text"){
+                        
+                        if (key == "functionCharac"){
+                            function_type = asset_temp.functionType;
                         }
-                        feat.push(number);
-                        feat_temps = '';
-                        k = k+1;
+                        else if (key == "uncertainCharac"){
+                            function_type = asset_temp.uncertaintyType;
+                        }
+                        var chain_features = form.value;
+                        var feat =[];
+                        var feat_temps ='';
+                        k = 0;
+                        
+                        for (chiffre of chain_features) {
+                            if (k < choices.nbFeature[function_type]) {
+                                if (chiffre !== ';') {
+                                    feat_temps = feat_temps + chiffre;
+                                } else {
+                                    number = Number(feat_temps);
+                                    if (number != number) {
+                                        console.log("Warning it was not the good syntax")
+                                        asset_name = asset_name + 'syntax error'
+                                    }
+                                    feat.push(number);
+                                    feat_temps = '';
+                                    k = k+1;
+                                }
+                            }
+                        }
+                        if (k < choices.nbFeature[function_type]){
+                            number = Number(feat_temps);
+                            if (number != number) {
+                                console.log("Warning it was not the good syntax");
+                                number =0;
+                            }
+                            feat.push(number);
+                        }
+                        asset_temp[key] = feat;
+                    } else if (form.type == "number"){
+                        if(flag_power){
+                            asset_temp.Pmaxcap = form.value;
+                            flag_power = false;
+                        } else {
+                            asset_temp.Pmincap = form.value;
+                            flag_power = true;
+                        }
                     }
                 }
             }
-            if (k < choices.nbFeature[function_type]){
-                number = Number(feat_temps);
-                if (number != number) {
-                console.log("Warning it was not the good syntax")
-                }
-                feat.push(number);
+            if(!flag_power){
+                asset_temp.Pmincap = asset_temp.Pmaxcap;
             }
-            var asset_temp = new Asset(id_asset,asset_name,asset_type, function_type, feat, Pmin, Pmax, [], [], [], [], [])
+            var Pmax = Number(asset_temp.Pmaxcap);
+            var Pmin = Number(asset_temp.Pmincap);
+
+            if (Pmin > Pmax) {
+                console.log("beware we have Pmin>Pmax, Pmin and Pmax will be exchange, you can rectify by modify asset or agent");
+                var P_temp = Pmax;
+                Pmax = Pmin;
+                Pmin = P_temp;
+            }
+            asset_temp.Pmaxcap = Pmax;
+            asset_temp.Pmincap = Pmin;
+
+            if (typeAgent != choices.typeAgent[2]){
+                if ((typeAgent == choices.typeAgent[0] && Pmax >0) || (typeAgent == choices.typeAgent[1] && Pmin < 0)) {
+                    typeAgent = choices.typeAgent[2];
+                } else if (typeAgent == '') {
+                    if (Pmax<=0){
+                        typeAgent = choices.typeAgent[0];
+                    } else if (Pmin>= 0) {
+                        typeAgent = choices.typeAgent[1];
+                    } else {
+                        typeAgent = choices.typeAgent[2];
+                    }
+                }
+            }
+            
+            if (asset_temp.type == choices.typeAsset[0]){
+                if (data.multipleStep_1[index] != undefined){
+                    var Pmaxt = [];
+                    for (pow of data.multipleStep_1[index]){
+                        Pmaxt.push(Number(pow));
+                    }
+                    asset_temp.Pmaxt = Pmaxt;
+                    var len = data.multipleStep_1[index].length;
+                    if (len > data.timeMax){
+                        data.timeMax = len;
+                    }
+                } 
+                if (data.multipleStep_2[index] != undefined){
+                    var Pmint = [];
+                    for (pow of data.multipleStep_2[index]){
+                        Pmint.push(Number(pow));
+                    }
+                    asset_temp.Pmint = Pmint;
+                    var len = data.multipleStep_2[index].length;
+                    if (len > data.timeMax){
+                        data.timeMax = len;
+                    }
+                }  
+            } else if (asset_temp.type == choices.typeAsset[1]){
+                if (data.multipleStep_1[index] != undefined){
+                    var Pt = [];
+                    for (pow of data.multipleStep_1[index]){
+                        Pt.push(Number(pow));
+                    }
+                    asset_temp.Pmt = Pt;
+                    var len = data.multipleStep_1[index].length;
+                    if (len > data.timeMax){
+                        data.timeMax = len;
+                    }
+                } 
+            }
+            data.multipleStep_1[index] = [];
+            data.multipleStep_2[index] = [];
             data.asset[id_asset] = asset_temp;
+            data.node[nodeId].typeAgent = typeAgent;  
         }
-    
-    // update the page
-    modAsset(nodeId)
+        
+        // update the graphe
+        var node = cy.getElementById(String(id_agent));
+
+        var links1 = cy.edges('[source = '+ '\"' + String(id_agent) +'\"' +']');
+        var links2 = cy.edges('[target = ' +'\"' + String(id_agent)+ '\"' +']');
+        
+        cy.remove(node);
+        cy.add({ data: { id: id_agent, name: data.node[id_agent].name, group: typeAgent} })
+        links1.restore();
+        links2.restore();
+        var layout = cy.elements().layout({
+            name: 'cose'
+            });
+        layout.run();
+
+        // update the page
+        modAsset(nodeId)
     }
     
 }
@@ -1282,7 +1706,10 @@ function delAgCom(NodeId = undefined) {
 
     // choice of the node
     var div = document.createElement("div");
-    div.textContent = "Which agent do you want to delete ? " 
+    var h3 = document.createElement("h3");
+    h3.textContent = "Which agent do you want to delete ? "
+    div.appendChild(h3);
+    div.className = "form";
 
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
@@ -1308,10 +1735,14 @@ function delAgCom(NodeId = undefined) {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "agent"
+    new SlimSelect({
+        select: '#agent'
+    })
     if (NodeId != undefined){
         var wrap = document.createElement("div");
         wrap.id = "wrap"
-
+        content.appendChild(wrap)
 
         var agent_id = NodeId
         var agent = data.node[agent_id];
@@ -1319,7 +1750,11 @@ function delAgCom(NodeId = undefined) {
 
             // choice of what we delete
             var div = document.createElement("div");
-            div.textContent = "What do you want to delete?";
+            var h3 = document.createElement("h3");
+            h3.textContent = "What do you want to delete ? ";
+            div.appendChild(h3);
+            div.className = "form";
+            
             var selctElm2 = document.createElement("select");
             var opt = document.createElement("option");
             opt.setAttribute("value", '');
@@ -1333,6 +1768,12 @@ function delAgCom(NodeId = undefined) {
             }
             div.appendChild(selctElm2);
             wrap.appendChild(div);
+            div.appendChild(selctElm1);
+            content.appendChild(div);
+            selctElm2.id = "choice1"
+            new SlimSelect({
+                select: '#choice1'
+            })
             selctElm2.onchange = function(choice) {
                 // remove the elements that we don't need on the page
                 var wrapper = document.getElementById("wrap2");
@@ -1344,7 +1785,10 @@ function delAgCom(NodeId = undefined) {
                 if (choice.target.value == choices.deleteAgent[1]) {
                     // choice of the assets
                     var div = document.createElement("div");
-                    div.textContent = "Which assets do you want to delete?";
+                    var h3 = document.createElement("h3");
+                    h3.textContent = "Which assets do you want to delete ? ";
+                    div.appendChild(h3);
+                    div.className = "form";
                     var selctElm3 = document.createElement("select");
                     selctElm3.multiple = "multiple";
                     selctElm3.id ="delete_asset";
@@ -1370,7 +1814,11 @@ function delAgCom(NodeId = undefined) {
         } else if (agent.type == choices.typeNode[1] ){
             // choice of what we delete
             var div = document.createElement("div");
-            div.textContent = "What do you want to delete?";
+            var h3 = document.createElement("h3");
+            h3.textContent = "What do you want to delete ? ";
+            div.appendChild(h3);
+            div.className = "form";
+            
             var selctElm2 = document.createElement("select");
             var opt = document.createElement("option");
             opt.setAttribute("value", '');
@@ -1384,11 +1832,15 @@ function delAgCom(NodeId = undefined) {
             }
             div.appendChild(selctElm2);
             wrap.appendChild(div);
+            selctElm2.id = "choice1"
+            new SlimSelect({
+                select: '#choice1'
+            })
         }
-        content.appendChild(wrap)
+        
     }
     selctElm1.onchange = function(choice) {
-        this.options[0].disabled = true; // remove the choice select
+        this.slim.data.data[0].disabled= true; // remove the choice select
         var buttonelm = document.getElementById("button_del_node")
             
         // remove the elements that we don't need on the page
@@ -1398,7 +1850,7 @@ function delAgCom(NodeId = undefined) {
         } 
         var wrap = document.createElement("div");
         wrap.id = "wrap"
-
+        content.insertBefore(wrap, buttonelm);
 
         var agent_id = choice.target.value;
         var agent = data.node[agent_id];
@@ -1406,7 +1858,11 @@ function delAgCom(NodeId = undefined) {
 
             // choice of what we delete
             var div = document.createElement("div");
-            div.textContent = "What do you want to delete?";
+            var h3 = document.createElement("h3");
+            h3.textContent = "What do you want to delete ? ";
+            div.appendChild(h3);
+            div.className = "form";
+        
             var selctElm2 = document.createElement("select");
             var opt = document.createElement("option");
             opt.setAttribute("value", '');
@@ -1420,6 +1876,10 @@ function delAgCom(NodeId = undefined) {
             }
             div.appendChild(selctElm2);
             wrap.appendChild(div);
+            selctElm2.id = "choice1"
+            new SlimSelect({
+                select: '#choice1'
+            })
 
             selctElm2.onchange = function(choice) {
                 // remove the elements that we don't need on the page
@@ -1432,7 +1892,11 @@ function delAgCom(NodeId = undefined) {
                 if (choice.target.value == choices.deleteAgent[1]) {
                     // choice of the assets
                     var div = document.createElement("div");
-                    div.textContent = "Which assets do you want to delete?";
+                    var h3 = document.createElement("h3");
+                    h3.textContent = "Which assets do you want to delete ? "; 
+                    div.appendChild(h3);
+                    div.className = "form";
+        
                     var selctElm3 = document.createElement("select");
                     selctElm3.multiple = "multiple";
                     selctElm3.id ="delete_asset";
@@ -1457,7 +1921,11 @@ function delAgCom(NodeId = undefined) {
         } else if (agent.type == choices.typeNode[1] ){
             // choice of what we delete
             var div = document.createElement("div");
-            div.textContent = "What do you want to delete?";
+            var h3 = document.createElement("h3");
+            h3.textContent = "What do you want to delete ? ";
+            div.appendChild(h3);
+            div.className = "form";
+           
             var selctElm2 = document.createElement("select");
             var opt = document.createElement("option");
             opt.setAttribute("value", '');
@@ -1471,12 +1939,16 @@ function delAgCom(NodeId = undefined) {
             }
             div.appendChild(selctElm2);
             wrap.appendChild(div);
+            selctElm2.id = "choice1"
+            new SlimSelect({
+                select: '#choice1'
+            })
 
             selctElm2.onchange = function() {
-                this.options[0].disabled = true;
+                this.slim.data.data[0].disabled= true;
             }
         }
-    content.insertBefore(wrap, buttonelm);
+    
    
     }
      /*  save of new data */
@@ -1485,7 +1957,7 @@ function delAgCom(NodeId = undefined) {
      var buttonelm = document.createElement("input");
 
      buttonelm.type = "button";
-     buttonelm.value = "delete Node";
+     buttonelm.value = "Delete Node";
      buttonelm.onclick = clicDelNode;
      div.appendChild(buttonelm);
      content.appendChild(div);   

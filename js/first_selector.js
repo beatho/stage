@@ -3,9 +3,24 @@
 
 window.addEventListener("load",function()
 {   
+    initialisation()
+})
+function initialisation() {
+    // Reset everything
+    initialisation_data();
     var wrap = document.getElementById("first_selection");
-    wrap.textContent = "Actions : ";
-    wrap.appendChild(document.createElement("br"));
+    wrap.textContent="";
+    var content = document.getElementById("content");
+    content.innerHTML ="";
+
+
+
+    var h3 = document.createElement("h3")
+    h3.textContent = "Actions : ";
+    wrap.appendChild(h3)
+
+    var span = this.document.createElement("span")
+    span.className = "first_selection";
     
     var selector = document.createElement("select");     
     var opt = document.createElement("option");
@@ -14,16 +29,22 @@ window.addEventListener("load",function()
     selector.appendChild(opt);
 
     for (var option of options)
-            {
-                option = option.id;
-                var opt = document.createElement("option");
-                opt.setAttribute("value", option);
-                opt.innerText = option;
-                selector.appendChild(opt);
-            }
-    wrap.appendChild(selector);
+    {
+        option = option.id;
+        var opt = document.createElement("option");
+        opt.setAttribute("value", option);
+        opt.innerText = option;
+        selector.appendChild(opt);
+    }
+    span.appendChild(selector)
+    wrap.appendChild(span);
+    selector.id = "first_select"
+    new SlimSelect({
+        select: '#first_select'
+    })
+
     selector.onchange = function(choice) {
-        this.options[0].disabled = true;
+        this.slim.data.data[0].disabled= true;
         // remove the element that we don't need on the page
         var select1 = document.getElementById("name_node");
         var select2 = document.getElementById("name_agent");
@@ -51,9 +72,11 @@ window.addEventListener("load",function()
             
             if (option.id === choice.target.value )
             {
+                var span = document.createElement("span")
+                span.id = "second_selector"
+                span.className = "first_selection";
                 var selector2 = document.createElement("select");
                 selector2.onchange = changeSelect2;
-                selector2.id = "second_selector"
                 var opt = document.createElement("option");
                 opt.setAttribute("value", '');
                 opt.innerText = 'Select...';
@@ -65,18 +88,24 @@ window.addEventListener("load",function()
                     opt.innerText = dat;
                     selector2.appendChild(opt); 
                 }
-                wrap.appendChild(selector2);
+                span.appendChild(selector2);
+                wrap.appendChild(span)
+                selector2.id = "second_select"
+                new SlimSelect({
+                    select: '#second_select'
+                })
             }
         } 
 
 
     }
 
-});
+};
 
 function changeSelect2() {
+    this.slim.data.data[0].disabled= true;
     var wrap = document.getElementById("first_selection");
-    var selects = document.getElementsByTagName("select");
+    var selects = wrap.getElementsByTagName("select");
     var button = document.getElementById("button_select");
     
     var value1 = selects[0].value;
@@ -100,20 +129,25 @@ function changeSelect2() {
 
 
     if (value1 ===options[0].id && value2===options[0].data[1]) {
+        var span = document.createElement("span")
+        span.id = "nb_agent";
+        span.className = "first_selection";
         var inputElm = document.createElement("input");
         inputElm.type = "number";
         inputElm.step = 1;
-        inputElm.id = "nb_agent";
         inputElm.min = 1;
         inputElm.value = 3;
         inputElm.required = "required";
-        
-        wrap.appendChild(inputElm);
+        inputElm.id = "input_nb_agent"
+        span.appendChild(inputElm);
+        wrap.appendChild(span)
 
         
     } else if (value1 ===options[1].id && value2 === options[1].data[1]) {
+        var span = document.createElement("span")
+        span.id = "name_node";
+        span.className = "first_selection";
         var selector3 = document.createElement("select");
-        selector3.id = "name_node";
         var opt = document.createElement("option");
         opt.setAttribute("value", '');
         opt.innerText = 'Select...';
@@ -126,10 +160,18 @@ function changeSelect2() {
                 selector3.appendChild(opt);
             }
         }
-        wrap.appendChild(selector3);
+        span.appendChild(selector3);
+        wrap.appendChild(span)
+        selector3.id = "third_select"
+        new SlimSelect({
+            select: '#third_select'
+        })
     } else if (value1 === options[1].id && value2 === options[1].data[2]) {
+        var span = document.createElement("span")
+        span.id = "name_agent";
+        span.className = "first_selection";
+        
         var selector4 = document.createElement("select");
-        selector4.id = "name_agent";
         var opt = document.createElement("option");
         opt.setAttribute("value", '');
         opt.innerText = 'Select...';
@@ -144,30 +186,45 @@ function changeSelect2() {
                 }
             }
         }
-        wrap.appendChild(selector4);
+        span.appendChild(selector4);
+        wrap.appendChild(span)
+        selector4.id = "third_select"
+        new SlimSelect({
+            select: '#third_select'
+        })
     } 
     if ((value1 === options[4].id && value2 === options[4].data[2])||(value1 === options[0].id && value2 === options[0].data[5]))  {
+        var span = document.createElement("span")
+        span.id = "button_select";
+        span.className = "first_selection";
+        
         var buttonelm = document.createElement("input");
         buttonelm.type = "file";
-        buttonelm.id = "button_select";
         buttonelm.onchange = clicSelectChoice;
         //buttonelm.onchange = opFile(buttonelm);
-        wrap.appendChild(buttonelm);
+        span.appendChild(buttonelm);
+        wrap.appendChild(span)
 
     } else {
+        var span = document.createElement("span")
+        span.id = "button_select";
+        span.className = "first_selection";
         var buttonelm = document.createElement("input");
         buttonelm.type = "button";
         buttonelm.value = "Select";
-        buttonelm.id = "button_select";
         buttonelm.onclick = clicSelectChoice;
-        wrap.appendChild(buttonelm);
+        span.appendChild(buttonelm);
+        wrap.appendChild(span)
+
     }
     
 
 }
 
 function clicSelectChoice() {
-    var selects = document.getElementsByTagName("select");
+    var wrap = document.getElementById("first_selection");
+    var selects = wrap.getElementsByTagName("select");
+    var input = document.getElementById("input_nb_agent")
     var value1 = selects[0].options[selects[0].selectedIndex].value;
     var value2 = selects[1].options[selects[1].selectedIndex].value;
     console.log(value1,value2);
@@ -178,7 +235,6 @@ function clicSelectChoice() {
                     addAgent();
                 break
                 case options[0].data[1]:
-                    var input = document.getElementById("nb_agent");
                     var value3 = input.value;
                     addCom(value3);
                 break
@@ -244,6 +300,6 @@ function clicSelectChoice() {
         break
     }
 } 
-// beware you need the push the button select to update the names when you add several communities
+
 
 

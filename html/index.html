@@ -4,7 +4,7 @@
         <!-- En-tête de la page -->
         
         <meta charset="utf-8" />
-		<link rel="stylesheet" href="style.css" />
+		
         <title>Page de test Beatrice</title>
         <script src="../js/first_selector.js"></script>
         <script src="../js/data_gestion.js"></script>
@@ -13,7 +13,7 @@
         <script src="../js/Link.js"></script>
         <script src="../js/Complex.js"></script>
         <script src="../js/graph.js"></script>
-        <script src="../js/tabs.js"></script>
+        <script src="../js/tabs2.js"></script>
         <script src="../js/function.js"></script>
         <script src="../js/parameters.js"></script>
         
@@ -21,14 +21,16 @@
 
                
         <script src="../node_modules/slim-select/dist/slimselect.min.js"></script>
-        <link href="../node_modules/slim-select/dist/slimselect.min.css" rel="stylesheet"></link>
+        <link href="../node_modules/slim-select/dist/slimselect.min.css" rel="stylesheet">
 
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
         <script src="../node_modules/cytoscape/dist/cytoscape.min.js"></script>
         <script src="../node_modules/cytoscape/cytoscape-cxtmenu.js"></script>
         <script src ="../node_modules/nouislider/distribute/nouislider.min.js"></script>
-        <link href="../node_modules/nouislider/distribute/nouislider.min.css" rel="stylesheet"></link>
+        <link href="../node_modules/nouislider/distribute/nouislider.min.css" rel="stylesheet">
+        <script src="../node_modules/papaparse/papaparse.min.js "></script>
         
+        <link rel="stylesheet" href="style.css" />
 
         <!-- Example 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -43,30 +45,37 @@
     </head>
 
     <body>
-    <p> Warning for this version, you need to clic on the button select between eatch operation to update the different forms. </p>
+    <p> All changes or adds are taken into account only when the button is clicked.
+    
+    </p>
         <!--  is="input" -->
         <!--<input-custom type="text" name="pseudo" legend= "Agent name: " example="Agent 20" > </input-custom>-->
         
-    <div class="systeme_onglets2">
-        <h1 class="onglets2">
-            <span class="onglet2_1 onglet" id="onglet_Market" onclick="javascript:change_onglet2('Market');"> Market </span>
-            <span class="onglet2_0 onglet" id="onglet_Parameters" onclick="javascript:change_onglet2('Parameters');"> Parameters </span>
-        </h1>
-        <div class="contenu_onglets">
-            <div class="contenu_onglet2" id="contenu_onglet2_Market" style = "display: block";>
-                <p id = "first_selection"> ceci est un test : </br> </p> 
+    <div class="systeme_tabs2"><!--
+        --><h1 class="tabs2"><!--
+            --><span class="tab2_1 tab" id="tab_Market" onclick="javascript:change_tab2('Market');"> Market</span><!--
+            --><span class="tab2_0 tab" id="tab_Parameters" onclick="javascript:change_tab2('Parameters');"> Parameters</span><!--
+        --></h1><!--
+        --><div class="content_tabs">
+            <div class="content_tab2" id="content_tab2_Market" style="display: block">
+                <p id = "first_selection"> </p> 
                 <hr>
-                <p id = "content"> test</p>
-                <div id="cy"></div>
+                <p id = "content"> </p>
             </div>
-            <div class="contenu_onglet2" id="contenu_onglet2_Parameters">
+            <div class="content_tab2" id="content_tab2_Parameters">
                 <div id ="parameters_selection" > 
 
                 </div>
-                
+            </div> 
         </div>
+        <div id="cy"></div>
     </div> 
-
-
+    <div class ="button_footer"> 
+        <input type ="button" value = "Save everything" onclick="clicSaveEverything()" >
+        <input type ="button" value = "Reset everything" onclick="clicResetEverything()">
+    </div>
+    <div class ="footer"> 
+        To get a user guide with all you need to know for this application, click <a href="User_guide.html" target="_blank">here</a>.
+    </div>
 	</body>
 </html>

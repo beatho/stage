@@ -5,7 +5,10 @@ function addLink() {
 
     // choice of the type of the link
     var div = document.createElement("div");
-    div.textContent = "Link type : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Link type : ";
+    div.appendChild(h3);
+    div.className = "form";
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
@@ -19,9 +22,13 @@ function addLink() {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "link_type"
+    new SlimSelect({
+        select: '#link_type'
+    })
     
     selctElm1.onchange = function(choice) {
-        this.options[0].disabled = true; // remove the choice select
+        this.slim.data.data[0].disabled= true; // remove the choice select
         // remove the elements that we don't need on the page
         var wrapper = document.getElementById("wrap");
         if (wrapper !== null){
@@ -33,7 +40,11 @@ function addLink() {
         if (choice.target.value === choices.typeLink[0]) {
             // choice of the source
             var div = document.createElement("div");
-            div.textContent = "Source : ";
+            var h3 = document.createElement("h3");
+            h3.textContent = "Source : ";
+            div.appendChild(h3);
+            div.className = "form";
+             
             var selctElm2 = document.createElement("select");
             var opt = document.createElement("option");
             opt.setAttribute("value", '');
@@ -50,9 +61,14 @@ function addLink() {
             
             div.appendChild(selctElm2);
             wrap.appendChild(div);
+            content.appendChild(wrap);
+            selctElm2.id = "first";
+            new SlimSelect({
+                select: '#first'
+            })
             
             selctElm2.onchange = function(choice) {
-                this.options[0].disabled = true; // remove the choice select
+                this.slim.data.data[0].disabled= true; // remove the choice select
                 // remove the elements that we don't need on the page
                 var div2er = document.getElementById("div2");
                 if (div2er !== null){
@@ -64,7 +80,11 @@ function addLink() {
 
                 // choice of the new partners
                 var div = document.createElement("div");
-                div.textContent = "New partners : ";
+                var h3 = document.createElement("h3");
+                h3.textContent = "New partners : ";
+                div.appendChild(h3);
+                div.className = "form";
+                
                 var selctElm3 = document.createElement("select");
                 selctElm3.id = 'members';
                 selctElm3.multiple = "multiple";
@@ -97,6 +117,10 @@ function addLink() {
                 }
                 div.appendChild(selctElm3);
                 div2.appendChild(div);
+                wrap.appendChild(div2)
+                new SlimSelect({
+                    select: '#members'
+                })
 
                 selctElm3.onchange = function(choice2) {
                     /*if (this.options[0].selected){
@@ -122,7 +146,10 @@ function addLink() {
                         div2.removeChild(input3)
                     } 
                     var div = document.createElement("div")
-                    div.textContent = "Preference of the source : ";
+                    var h3 = document.createElement("h3");
+                    h3.textContent = "Preference of the source : ";
+                    div.appendChild(h3);
+                    div.className = "form";
                     div.id = "preferenceSource"
                     var inputElm = document.createElement("input");
                     inputElm.type = "number";
@@ -137,7 +164,11 @@ function addLink() {
 
 
                     var div = document.createElement("div")
-                    div.textContent = "Preference of the destinations : ";
+                    var h3 = document.createElement("h3");
+                    h3.textContent = "Preference of the destinations : ";
+                    div.appendChild(h3);
+                    div.className = "form";
+                    
                     div.id = "preferenceDestination"
                     var inputElm = document.createElement("input");
                     inputElm.type = "text";
@@ -153,7 +184,7 @@ function addLink() {
                     }
 
                     var Chain = '0 ;';
-                    for (var indice =1; indice < nb_members; indice ++) {
+                    for (var index =1; index < nb_members; index ++) {
                         Chain = Chain + ' 0 ;';
                     }
                     inputElm.value = Chain;
@@ -171,20 +202,19 @@ function addLink() {
                     div.appendChild(buttonelm);
                     div2.appendChild(div);
                 }
-                wrap.appendChild(div2);
-                new SlimSelect({
-                    select: '#members'
-                })
                 
             }
             
-            content.appendChild(wrap);
+            
             
 
         } else if (choice.target.value === choices.typeLink[1]){
             // choice of the community manager
             var div = document.createElement("div");
-            div.textContent = "Community manager : ";
+            var h3 = document.createElement("h3");
+            h3.textContent = "Community manager : ";
+            div.appendChild(h3);
+            div.className = "form";
             var selctElm2 = document.createElement("select");
             
             var opt = document.createElement("option");
@@ -205,12 +235,14 @@ function addLink() {
             div.appendChild(selctElm2);
             wrap.appendChild(div);
             content.appendChild(wrap);
-            
-            
-            
+            selctElm2.id = "first"
+            new SlimSelect({
+                select: '#first'
+            })
+                   
             
             selctElm2.onchange = function(choice) {
-                this.options[0].disabled = true; // remove the choice select
+                this.slim.data.data[0].disabled= true; // remove the choice select
                 // remove the elements that we don't need on the page
                 var div2er = document.getElementById("div2");
                 if (div2er !== null){
@@ -222,7 +254,10 @@ function addLink() {
 
                 // choice of the new community members
                 var div = document.createElement("div");
-                div.textContent = "New community members : ";
+                var h3 = document.createElement("h3");
+                h3.textContent = "New community members : ";
+                div.appendChild(h3);
+                div.className = "form";
                 var selctElm3 = document.createElement("select");
                 selctElm3.id = 'members';
                 selctElm3.multiple = "multiple";
@@ -248,10 +283,15 @@ function addLink() {
                 }
                 div.appendChild(selctElm3);
                 div2.appendChild(div);
+                wrap.appendChild(div2);
+                new SlimSelect({
+                    select: '#members'
+                })    
 
-                selctElm3.onchange = function(choice2) {
+                selctElm3.onchange = function() {
                     if (this.options[0].selected){
                         for (opt of this.options){
+                            console.log("hello")
                             opt.selected = true;
                         }
                     } // remove the choice select
@@ -265,7 +305,10 @@ function addLink() {
                         div2.removeChild(input3)
                     } 
                     var div = document.createElement("div")
-                    div.textContent = "Preference of the community manager : ";
+                    var h3 = document.createElement("h3");
+                    h3.textContent = "Preference of the community manager : ";
+                    div.appendChild(h3);
+                    div.className = "form";
                     div.id = "preferenceSource"
                     var inputElm = document.createElement("input");
                     inputElm.type = "number";
@@ -280,7 +323,10 @@ function addLink() {
 
 
                     var div = document.createElement("div")
-                    div.textContent = "Preference of the agents : ";
+                    var h3 = document.createElement("h3");
+                    h3.textContent = "Preference of the agents : ";
+                    div.appendChild(h3);
+                    div.className = "form";
                     div.id = "preferenceDestination"
                     var inputElm = document.createElement("input");
                     inputElm.type = "text";
@@ -296,7 +342,7 @@ function addLink() {
                     }
 
                     var Chain = '0 ;';
-                    for (var indice =1; indice < nb_members; indice ++) {
+                    for (var index =1; index < nb_members; index ++) {
                         Chain = Chain + ' 0 ;';
                     }
                     inputElm.value = Chain;
@@ -314,10 +360,6 @@ function addLink() {
                     div.appendChild(buttonelm);
                     div2.appendChild(div);
                 }
-                wrap.appendChild(div2);
-                new SlimSelect({
-                    select: '#members'
-                })
                 
             }
             
@@ -374,11 +416,11 @@ function clicAddLink() {
         }
          // add all link need
         var len = data.node.length;
-        for(var indice1 = 0; indice1 < len-1; indice1++){
-            var source = data.node[indice1];
+        for(var index1 = 0; index1 < len-1; index1++){
+            var source = data.node[index1];
             if (source != undefined) {
-                for (var indice2 = indice1+1; indice2<len; indice2++){
-                    var destination = data.node[indice2];
+                for (var index2 = index1+1; index2<len; index2++){
+                    var destination = data.node[index2];
                     if (destination != undefined && !source.partners.includes(destination.id)){
                         if ( data.idLinkUnused.length >0 ) {
                             var id_link = data.idLinkUnused.shift();                
@@ -388,8 +430,8 @@ function clicAddLink() {
                         name = 'Link ' + String(id_link);
                         var link_temp = new Link(id_link,choices.typeLink[0],source.id,destination.id,name,0,0);
                         links.push({data: { id: 'l'+id_link, source: source.id, target: destination.id, group: choices.typeLink[0]}});
-                        data.node[indice1].partners.push(destination.id);
-                        data.node[indice2].partners.push(source.id);
+                        data.node[index1].partners.push(destination.id);
+                        data.node[index2].partners.push(source.id);
                         data.link[id_link] = link_temp;
                     }
                 }
@@ -407,12 +449,12 @@ function clicAddLink() {
         }
         // add all link need
         var len = data.node.length;
-        for(var indice1 = 0; indice1 < len-1; indice1++){
-            var source = data.node[indice1];
+        for(var index1 = 0; index1 < len-1; index1++){
+            var source = data.node[index1];
             if (source != undefined) {
                 var type_source = source.typeAgent;
-                for (var indice2 = indice1+1; indice2<len; indice2++){
-                    var destination = data.node[indice2];
+                for (var index2 = index1+1; index2<len; index2++){
+                    var destination = data.node[index2];
                     if (destination != undefined && !source.partners.includes(destination.id)){
                         var type_destination = destination.typeAgent;
                         if (type_source == choices.typeAgent[2] || type_destination == choices.typeAgent[2] || type_source != type_destination ){
@@ -424,8 +466,8 @@ function clicAddLink() {
                             name = 'Link ' + String(id_link);
                             var link_temp = new Link(id_link,choices.typeLink[0],source.id,destination.id,name,0,0);
                             links.push({data: { id: 'l'+id_link, source: source.id, target: destination.id, group:choices.typeLink[0]}});
-                            data.node[indice1].partners.push(destination.id);
-                            data.node[indice2].partners.push(source.id);
+                            data.node[index1].partners.push(destination.id);
+                            data.node[index2].partners.push(source.id);
                             data.link[id_link] = link_temp;
                             }
                         
@@ -486,7 +528,7 @@ function clicAddLink() {
             }
             name = 'Link' + String(id_link);
             var link_temp = new Link(id_link,type_link,source,member,name,weightSrc,weightDest.shift());
-            data.link.push(link_temp);
+            data.link[id_link] = link_temp;
             links.push({data: { id: 'l'+id_link, source: source, target: member, group: type_link }});
             if (type_link == choices.typeLink[1]){
                 data.node[source].communityMember.push(member);
@@ -522,13 +564,16 @@ function modLink(linkId = undefined ) {
 
     // choice of the type of the link
     var div = document.createElement("div");
-    div.textContent = "Link type : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Link type : ";
+    div.appendChild(h3);
+    div.className = "form";
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
     opt.innerText = 'Select...';
     selctElm1.appendChild(opt);
-    for (choice of choices.typeLink){
+    for (choice of choices.typeLinkMod){
         var opt = document.createElement("option");
         opt.setAttribute("value", choice);
         opt.innerText = choice;
@@ -539,17 +584,24 @@ function modLink(linkId = undefined ) {
             }
         }
     }
+    selctElm1.id = "link_type";
     div.appendChild(selctElm1);
     content.appendChild(div);
+    new SlimSelect({
+        select: '#link_type'
+    })
 
-    console.log(linkId)
+    //console.log(linkId)
     if (linkId != undefined){
         
         var source = data.node[oldLink.source];
         var wrap = document.createElement("div");
         wrap.id = "wrap"
         var div = document.createElement("div");
-        div.textContent = "Between : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Between : ";
+        div.appendChild(h3);
+        div.className = "form";
         var selctElm2 = document.createElement("select");
         var opt = document.createElement("option");
         opt.setAttribute("value", oldLink.source);
@@ -557,11 +609,20 @@ function modLink(linkId = undefined ) {
         selctElm2.appendChild(opt);
         div.appendChild(selctElm2);
         wrap.appendChild(div);
+        content.appendChild(wrap);
+        selctElm2.id = "source"
+        new SlimSelect({
+            select: '#source'
+        })
               
         var div2 = document.createElement("div");
         div2.id = "div2";
         var div = document.createElement("div");
-        div.textContent = "And : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "And : ";
+        div.appendChild(h3);
+        div.className = "form";
+        
         var selctElm3 = document.createElement("select");
         var opt = document.createElement("option");
         opt.setAttribute("value", oldLink.id);
@@ -571,9 +632,17 @@ function modLink(linkId = undefined ) {
         div.appendChild(selctElm3);
         div2.appendChild(div);
         wrap.appendChild(div2);
+        selctElm3.id = "dest"
+        new SlimSelect({
+            select: '#dest'
+        })
 
         var div = document.createElement("div")
-        div.textContent = "Preference of the first node : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Preference of the first node : ";
+        div.appendChild(h3);
+        div.className = "form";
+        
         div.id = "preferenceFirstNode"
         var inputElm = document.createElement("input");
         inputElm.type = "number";
@@ -587,7 +656,11 @@ function modLink(linkId = undefined ) {
 
 
         var div = document.createElement("div")
-        div.textContent = "Preference of the second node : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Preference of the second node : ";
+        div.appendChild(h3);
+        div.className = "form";
+        
         div.id = "preferenceSecondNode"
         var inputElm = document.createElement("input");
         inputElm.type = "number";
@@ -610,13 +683,13 @@ function modLink(linkId = undefined ) {
         div2.appendChild(div);
         wrap.appendChild(div2);
 
-        content.appendChild(wrap);
+        
 
     }
 
     
     selctElm1.onchange = function(choice) {
-        this.options[0].disabled = true; // remove the choice select
+        this.slim.data.data[0].disabled= true; // remove the choice select
         
         // remove the elements that we don't need on the page
         var wrapper = document.getElementById("wrap");
@@ -629,7 +702,11 @@ function modLink(linkId = undefined ) {
        
         // choice of the first componant
         var div = document.createElement("div");
-        div.textContent = "Between : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Between : ";
+        div.appendChild(h3);
+        div.className = "form";
+
         var selctElm2 = document.createElement("select");
         var opt = document.createElement("option");
         opt.setAttribute("value", '');
@@ -647,9 +724,14 @@ function modLink(linkId = undefined ) {
         
         div.appendChild(selctElm2);
         wrap.appendChild(div);
+        content.appendChild(wrap);
+        selctElm2.id = "first"
+        new SlimSelect({
+            select: '#first'
+        })
 
         selctElm2.onchange = function(choice) {
-            this.options[0].disabled = true; // remove the choice select
+            this.slim.data.data[0].disabled= true; // remove the choice select
             // remove the elements that we don't need on the page
             var div2er = document.getElementById("div2");
             if (div2er !== null){
@@ -661,7 +743,11 @@ function modLink(linkId = undefined ) {
 
             // choice of the second componant
             var div = document.createElement("div");
-            div.textContent = "And : ";
+            var h3 = document.createElement("h3");
+            h3.textContent = "And : ";
+            div.appendChild(h3);
+            div.className = "form";
+        
             var selctElm3 = document.createElement("select");
             var firstnode = data.node[choice.target.value];
             var opt = document.createElement("option");
@@ -693,21 +779,29 @@ function modLink(linkId = undefined ) {
             div.appendChild(selctElm3);
             div2.appendChild(div);
             wrap.appendChild(div2);
+            selctElm3.id = "second"
+            new SlimSelect({
+                select: '#second'
+            })
 
             selctElm3.onchange = function(choice2) {
-                this.options[0].disabled = true; // remove the choice select
+                this.slim.data.data[0].disabled= true; // remove the choice select
                 var input1 = document.getElementById("preferenceFirstNode");
                 var input2 = document.getElementById("preferenceSecondNode");
-                var input3 = document.getElementById("button_add_link")
+                var input3 = document.getElementById("button_mod_link")
 
                 if (input1 !== null){
                     div2.removeChild(input1)
                     div2.removeChild(input2)
                     div2.removeChild(input3)
                 } 
-                var div = document.createElement("div")
-                div.textContent = "Preference of the first node : ";
-                div.id = "preferenceFirstNode"
+                var div = document.createElement("div");
+                var h3 = document.createElement("h3");
+                h3.textContent = "Preference of the first node : ";
+                div.appendChild(h3);
+                div.className = "form";
+                
+                div.id = "preferenceFirstNode";
                 var inputElm = document.createElement("input");
                 inputElm.type = "number";
                 inputElm.step = "any";
@@ -720,8 +814,12 @@ function modLink(linkId = undefined ) {
                 div2.appendChild(div);
 
 
-                var div = document.createElement("div")
-                div.textContent = "Preference of the second node : ";
+                var div = document.createElement("div");
+                var h3 = document.createElement("h3");
+                h3.textContent = "Preference of the second node : ";
+                div.appendChild(h3);
+                div.className = "form";
+                
                 div.id = "preferenceSecondNode"
                 var inputElm = document.createElement("input");
                 inputElm.type = "number";
@@ -782,13 +880,17 @@ function delLink() {
 
     // choice of the type of the link
     var div = document.createElement("div");
-    div.textContent = "Link type : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Link type : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
     opt.innerText = 'Select...';
     selctElm1.appendChild(opt);
-    for (choice of choices.typeLink){
+    for (choice of choices.typeLinkMod){
         var opt = document.createElement("option");
         opt.setAttribute("value", choice);
         opt.innerText = choice;
@@ -796,9 +898,13 @@ function delLink() {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "type_link"
+        new SlimSelect({
+            select: '#type_link'
+        })
     
     selctElm1.onchange = function(choice) {
-        this.options[0].disabled = true; // remove the choice select
+        this.slim.data.data[0].disabled= true; // remove the choice select
         
         // remove the elements that we don't need on the page
         var wrapper = document.getElementById("wrap");
@@ -811,7 +917,11 @@ function delLink() {
        
         // choice of the first componant
         var div = document.createElement("div");
-        div.textContent = "Between : ";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Between : ";
+        div.appendChild(h3);
+        div.className = "form";
+        
         var selctElm2 = document.createElement("select");
         var opt = document.createElement("option");
         opt.setAttribute("value", '');
@@ -828,10 +938,13 @@ function delLink() {
         
         div.appendChild(selctElm2);
         wrap.appendChild(div);
-        
+        selctElm2.id = "first"
+        new SlimSelect({
+            select: '#first'
+        })
         
         selctElm2.onchange = function(choice) {
-            this.options[0].disabled = true; // remove the choice select
+            this.slim.data.data[0].disabled= true; // remove the choice select
             // remove the elements that we don't need on the page
             var div2er = document.getElementById("div2");
             if (div2er !== null){
@@ -843,7 +956,11 @@ function delLink() {
 
             // choice of the second componant
             var div = document.createElement("div");
-            div.textContent = "And : ";
+            var h3 = document.createElement("h3");
+            h3.textContent = "And : ";
+            div.appendChild(h3);
+            div.className = "form";
+            
             var selctElm3 = document.createElement("select");
             var firstnode = data.node[choice.target.value];
             var opt = document.createElement("option");
@@ -876,6 +993,10 @@ function delLink() {
             div.appendChild(selctElm3);
             div2.appendChild(div);
             wrap.appendChild(div2);
+            selctElm3.id = "second"
+            new SlimSelect({
+                select: '#second'
+            })
 
             // button to save the choice
             var div = document.createElement("div");

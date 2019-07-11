@@ -1,3 +1,4 @@
+
 function addCom(nb_agent) {
     //console.log('ok pour ' + String(nb_agent) + ' Agent');
     var content = document.getElementById("content");
@@ -5,7 +6,11 @@ function addCom(nb_agent) {
        
     // choice of the name of the community
     var div = document.createElement("div");
-    div.textContent = "Community name : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Community name : ";
+    div.appendChild(h3);
+    div.className = "form";
+
     var textElm = document.createElement("input");
     textElm.id = "community_name";
     textElm.type = "text";
@@ -16,7 +21,11 @@ function addCom(nb_agent) {
     
     // choice of the Community objective:
     var div = document.createElement("div");
-    div.textContent = "Community objective : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Community objective : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm1 = document.createElement("select");
     for (choice of choices.comObjective){
         var opt = document.createElement("option");
@@ -26,10 +35,18 @@ function addCom(nb_agent) {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "com_obj"
+    new SlimSelect({
+        select: '#com_obj'
+    })
     
     //choice of trading partners
     var div = document.createElement("div");
-    div.textContent = "Trading partners : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Trading partners : ";
+    div.appendChild(h3);
+    div.className = "form";
+
     var selctElm2 = document.createElement("select");
     selctElm2.multiple = "multiple"
     selctElm2.id = "trading"
@@ -53,7 +70,10 @@ function addCom(nb_agent) {
     
     // choice of the names of the agent
     var div = document.createElement("div");
-    div.textContent = "Community member names : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Community member names : ";
+    div.appendChild(h3);
+    div.className = "form";
     var textElm = document.createElement("input");
     textElm.id = "community_member_name";
     textElm.type = "text";
@@ -67,15 +87,16 @@ function addCom(nb_agent) {
     
     // save of new data
     var div = document.createElement("div");
+    div.id = "button_add_comm"
     var buttonelm = document.createElement("input");
 
     buttonelm.type = "button";
     buttonelm.value = "Add community";
-    buttonelm.id = "button_add_comm";
+    buttonelm.id = "add_comm";
     buttonelm.onclick = clicAddComm(nb_agent);
     div.appendChild(buttonelm);
     content.appendChild(div);
-}
+} // create a community, ie
 
 function clicAddComm(nb_agent) {
     return function() {
@@ -193,7 +214,11 @@ function addExample() {
 
     // choice of the example
     var div = document.createElement("div");
-    div.textContent = "Example : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Example : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
@@ -207,6 +232,10 @@ function addExample() {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "example"
+    new SlimSelect({
+        select: '#example'
+    })
 
     selctElm1.onchange = function() {
         this.options[0].disabled = true;
@@ -290,6 +319,12 @@ function concatData(data_added) {
     for (element of data_added.node){
         if (element != undefined){
             element.id = element.id + len_node;
+            if (data.idNodeUnused.includes(element.id)) {
+                data.idNodeUnused.splice(data.idNodeUnused.indexOf(element.id),1);
+            }
+            if (data_added.idNodeUnused.includes(element.id)) {
+                data_added.idNodeUnused.splice(data_added.idNodeUnused.indexOf(element.id),1);
+            }
             var len_admins = element.administrator.length;
             var len_part = element.partners.length;
             var len_assets = element.asset.length;
@@ -319,7 +354,7 @@ function concatData(data_added) {
             if (checkname(element.name)){
                 element.name = element.type +' '+ String(element.id);
             }
-            data.node.push(element);
+            data.node[element.id] = element;
         }
         
     }
@@ -327,11 +362,17 @@ function concatData(data_added) {
     for (element of data_added.link){
         if (element != undefined){
             element.id = element.id + len_link;
+            if (data.idLinkUnused.includes(element.id)) {
+                data.idLinkUnused.splice(data.idLinkUnused.indexOf(element.id),1);
+            }
+            if (data_added.idLinkUnused.includes(element.id)) {
+                data_added.idLinkUnused.splice(data_added.idLinkUnused.indexOf(element.id),1);
+            }
             element.source = element.source + len_node; 
             element.destination = element.destination + len_node; 
             element.name = 'Link ' + String(element.id);
             
-            data.link.push(element);
+            data.link[element.id] = element;
         }
     }
 
@@ -340,7 +381,13 @@ function concatData(data_added) {
     for (element of data_added.asset){
         if (element != undefined){
             element.id = element.id + len_asset;
-            data.asset.push(element);
+            if (data.idAssetUnused.includes(element.id)) {
+                data.idAssetUnused.splice(data.idAssetUnused.indexOf(element.id),1);
+            }
+            if (data_added.idAssetUnused.includes(element.id)) {
+                data_added.idAssetUnused.splice(data_added.idAssetUnused.indexOf(element.id),1);
+            }
+            data.asset[element.id] = element;
         }
     }
 
@@ -362,26 +409,31 @@ function opNew() {
     content.innerHTML ="";
 
     var div = document.createElement('div');
-    div.textContent = 'Are you sure ? It will delete everything.'
+    div.textContent = 'Are you sure ? It will delete every asset, node and link .'
 
     var button = document.createElement('input');
     button.type = "button";
     button.value = "confirm";
     button.onclick = function() {
         data = {
-        nodeAgentName: [],
-        nodeAdministratorName: [],
-        link: [],
-        asset: [],
-        node: [],
-        idLinkUnused: [],
-        idAssetUnused: [],
-        idNodeUnused: [],
-        old_onglet: "asset_1",
-        oldNbAsset: 1
+            link: [],
+            asset: [],
+            node: [],
+            idLinkUnused: [],
+            idAssetUnused: [],
+            idNodeUnused: [],
+            old_onglet: "asset_1",
+            old_onglet2: "Market",
+            oldNbAsset: 1,
+            timeMax: 3,
+            multipleStep_1: [],
+            multipleStep_2: []
+
         }
         resetGraph();
     }
+    div.appendChild(button)
+    content.appendChild(div)
 }
 
 function opExample() {
@@ -390,7 +442,11 @@ function opExample() {
 
     // choice of the example
     var div = document.createElement("div");
-    div.textContent = "Example : ";
+    var h3 = document.createElement("h3");
+    h3.textContent = "Example : ";
+    div.appendChild(h3);
+    div.className = "form";
+    
     var selctElm1 = document.createElement("select");
     var opt = document.createElement("option");
     opt.setAttribute("value", '');
@@ -404,6 +460,10 @@ function opExample() {
     }
     div.appendChild(selctElm1);
     content.appendChild(div);
+    selctElm1.id = "example"
+    new SlimSelect({
+        select: '#example'
+    })
 
     selctElm1.onchange = function() {
         this.options[0].disabled = true;
@@ -446,7 +506,10 @@ function clicOpExample() {
        if(xhr.readyState  == 4)
        {
         if(xhr.status  == 200) {
-            data=JSON.parse(xhr.responseText);
+            new_data=JSON.parse(xhr.responseText);
+            for (key of Object.keys(new_data)){
+                data[key] = new_data[key];
+            }
             updateGraph();
             opExample();
         }else {

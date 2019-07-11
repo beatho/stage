@@ -160,10 +160,3 @@ window.tabs.apply = function (){
         
     });
 }
-
-/*if(element.init != true){
-    element.init = true;*/
-
-
-
-

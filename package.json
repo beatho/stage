@@ -12,7 +12,7 @@
     "cytoscape": "^3.6.2",
     "jquery": "^3.4.1",
     "nouislider": "^13.1.5",
-    "papaparse": "^5.0.0",
+    "papaparse": "^5.2.0",
     "slim-select": "^1.21.0"
   }
 }
